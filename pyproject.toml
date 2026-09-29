@@ -1,7 +1,27 @@
 [project]
 name = "dall-em"
 version = "0.1.0"
-description = "Add your description here"
+description = "16x16 metal-mask circuit simulation with openEMS"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy==1.26.4",
+    "matplotlib==3.9.4",
+    "scipy==1.13.1",
+    "h5py",
+    "pyyaml",
+    "pillow",
+]
+
+[project.scripts]
+rf-repro = "rf_repro.__main__:main"
+
+[build-system]
+requires = ["setuptools==75.8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rf_repro = ["configs/*.yaml", "data/*.csv"]

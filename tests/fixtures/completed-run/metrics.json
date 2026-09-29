@@ -1,0 +1,19 @@
+{
+  "max_outgoing_power_per_incident": {
+    "1": 0.9964748789961129,
+    "2": 0.9956302126899763
+  },
+  "passivity_tolerance": 0.02,
+  "extraction": "S=B inv(A), both incident waves retained",
+  "max_incident_matrix_condition": 1.0235907319704134,
+  "unexcited_port_incident_ratio": {
+    "1": 0.011571092695087465,
+    "2": 0.011500727533440343
+  },
+  "max_singular_value": 1.0022673461446736,
+  "max_reciprocity_error": 0.0007444913485949264,
+  "passband_s21_min_dB": -4.93357072904622,
+  "passband_s21_max_dB": -0.5407756595916189,
+  "phase_delay_median_ps": 149.35105688997157,
+  "first_downward_3dB_GHz": 15.781893429238917
+}

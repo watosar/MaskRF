@@ -1,0 +1,121 @@
+{
+  "assumptions": [
+    "PEC metal and zero dielectric loss are preliminary approximations",
+    "Ground spans entire bottom boundary",
+    "No de-embedding beyond MSL measurement-plane placement",
+    "AC ground modelled as solid square PEC short through substrate, width one pixel",
+    "Both feeds 12mm by .35mm; left length inferred from right",
+    "Feed centre offsets inferred from image; substrate lateral extent assumed",
+    "16x16 metal interior; 18x18 includes terminal perimeter inferred from figures 2 and 3"
+  ],
+  "boundary": [
+    "PML_8",
+    "PML_8",
+    "MUR",
+    "MUR",
+    "PEC",
+    "MUR"
+  ],
+  "convergence": [
+    {
+      "local_mm": 0.09,
+      "max_mm": 0.3,
+      "pixel_subdivisions": 1,
+      "substrate_cells": 3
+    },
+    {
+      "local_mm": 0.07,
+      "max_mm": 0.22,
+      "pixel_subdivisions": 2,
+      "substrate_cells": 4
+    },
+    {
+      "local_mm": 0.05,
+      "max_mm": 0.16,
+      "pixel_subdivisions": 3,
+      "substrate_cells": 6
+    }
+  ],
+  "domain": {
+    "air_top_mm": 3,
+    "y_mm": [
+      -3,
+      3
+    ]
+  },
+  "frequency_GHz": [
+    10,
+    30,
+    401
+  ],
+  "geometry": {
+    "file": "/home/user/vibe/dall-em/tmp/rf-repro/results/paper-refine-9-01/mask.csv",
+    "kind": "mask",
+    "pitch_mm": 0.125,
+    "shorts": [
+      {
+        "width_mm": 0.125,
+        "xy_mm": [
+          -0.9375,
+          0.9375
+        ]
+      },
+      {
+        "width_mm": 0.125,
+        "xy_mm": [
+          -0.3125,
+          -0.9375
+        ]
+      }
+    ]
+  },
+  "mesh": {
+    "edge_rule": "thirds",
+    "local_mm": 0.004166666666666667,
+    "max_mm": 0.075,
+    "pixel_subdivisions": 9,
+    "probe_step_mm": 0.025,
+    "substrate_cells": 16,
+    "verify_feed_edges": true
+  },
+  "metal": {
+    "model": "PEC",
+    "thickness_mm": 0.035
+  },
+  "name": "Fig.3(a): verified feed edges; pixel subdivision 9",
+  "ports": {
+    "feed_length_mm": 12,
+    "feed_shift_mm": 2,
+    "measurement_shift_mm": 3,
+    "reference_ohm": 50,
+    "type": "MSL",
+    "width_mm": 0.35,
+    "y_mm": [
+      -0.5625,
+      -0.6875
+    ]
+  },
+  "solver": {
+    "end_criteria": 1e-07,
+    "excitations": [
+      1,
+      2
+    ],
+    "max_cells": 10000000,
+    "max_steps": 400000,
+    "threads": 4,
+    "timeout_s": 7200
+  },
+  "substrate": {
+    "conductivity_S_m": 0,
+    "epsilon_r": 3.66,
+    "thickness_mm": 0.16764
+  },
+  "validation": {
+    "complex_delta_tolerance": 0.02,
+    "passband_GHz": [
+      10,
+      14
+    ]
+  }
+}

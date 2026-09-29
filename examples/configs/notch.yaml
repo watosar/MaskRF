@@ -1,0 +1,73 @@
+name: Official notch tutorial dimensions, lossless PEC
+geometry:
+  kind: notch
+  stub_mm: 12
+substrate:
+  thickness_mm: 0.254
+  epsilon_r: 3.66
+  conductivity_S_m: 0
+metal:
+  model: PEC
+  thickness_mm: 0
+frequency_GHz:
+- 0.1
+- 7
+- 401
+ports:
+  type: MSL
+  width_mm: 0.6
+  feed_length_mm: 50
+  y_mm:
+  - 0
+  - 0
+  feed_shift_mm: 4
+  measurement_shift_mm: 16.666666666666668
+  reference_ohm: 50
+mesh:
+  max_mm: 0.45
+  local_mm: 0.1125
+  substrate_cells: 4
+  pixel_subdivisions: 1
+domain:
+  y_mm:
+  - -9
+  - 21
+  air_top_mm: 3
+boundary:
+- PML_8
+- PML_8
+- MUR
+- MUR
+- PEC
+- MUR
+solver:
+  threads: 4
+  max_steps: 60000
+  end_criteria: 1.0e-05
+  timeout_s: 1200
+  max_cells: 3000000
+  excitations:
+  - 1
+  - 2
+validation:
+  passband_GHz:
+  - 0.1
+  - 1
+  complex_delta_tolerance: 0.02
+convergence:
+- max_mm: 0.3
+  local_mm: 0.09
+  substrate_cells: 3
+  pixel_subdivisions: 1
+- max_mm: 0.22
+  local_mm: 0.07
+  substrate_cells: 4
+  pixel_subdivisions: 2
+- max_mm: 0.16
+  local_mm: 0.05
+  substrate_cells: 6
+  pixel_subdivisions: 3
+assumptions:
+- PEC metal and zero dielectric loss are preliminary approximations
+- Ground spans entire bottom boundary
+- No de-embedding beyond MSL measurement-plane placement

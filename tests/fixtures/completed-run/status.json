@@ -1,0 +1,46 @@
+[
+  {
+    "excitation": 1,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/user/vibe/dall-em/tmp/rf-repro/results/paper-refine-9-01/resources-1.txt",
+      "/home/user/vibe/dall-em/tmp/rf-repro/.venv/bin/python3",
+      "-m",
+      "rf_repro",
+      "worker",
+      "--run",
+      "/home/user/vibe/dall-em/tmp/rf-repro/results/paper-refine-9-01",
+      "--excitation",
+      "1"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 2123.97842145701,
+    "normal_finish": true,
+    "decay_confirmed": true,
+    "caution": "Inspect solver log; energy criterion is independent of mesh convergence"
+  },
+  {
+    "excitation": 2,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/user/vibe/dall-em/tmp/rf-repro/results/paper-refine-9-01/resources-2.txt",
+      "/home/user/vibe/dall-em/tmp/rf-repro/.venv/bin/python3",
+      "-m",
+      "rf_repro",
+      "worker",
+      "--run",
+      "/home/user/vibe/dall-em/tmp/rf-repro/results/paper-refine-9-01",
+      "--excitation",
+      "2"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 1357.1038778560032,
+    "normal_finish": true,
+    "decay_confirmed": true,
+    "caution": "Inspect solver log; energy criterion is independent of mesh convergence"
+  }
+]
