@@ -1,0 +1,582 @@
+{
+  "baseline": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.0445087157853121,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 48.155325038060596,
+            "line_impedance_imag_ohm": 0.43197629648625574,
+            "beta_real_rad_m": 369.1926787159445,
+            "beta_imag_rad_m": 2.582084310015365
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 49.09074457007363,
+            "line_impedance_imag_ohm": 0.3675446863242128,
+            "beta_real_rad_m": 430.16550419762217,
+            "beta_imag_rad_m": 2.7713352787210805
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 48.54774970518529,
+            "line_impedance_imag_ohm": 0.3245928373675108,
+            "beta_real_rad_m": 703.8682719170291,
+            "beta_imag_rad_m": 1.7604702893878599
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 48.26342270237354,
+            "line_impedance_imag_ohm": 0.8203207297013402,
+            "beta_real_rad_m": 370.178386186839,
+            "beta_imag_rad_m": 6.171345870587274
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 48.51211170286953,
+            "line_impedance_imag_ohm": -0.08272551569474776,
+            "beta_real_rad_m": 425.78619567519513,
+            "beta_imag_rad_m": -0.8401727401499408
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 49.63248715081842,
+            "line_impedance_imag_ohm": 1.6435327760904765,
+            "beta_real_rad_m": 690.3702267603486,
+            "beta_imag_rad_m": -19.193718589575518
+          }
+        ]
+      }
+    ]
+  },
+  "epsilon_4p4": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.1270209935707356,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 44.702749019010156,
+            "line_impedance_imag_ohm": 0.776111771040946,
+            "beta_real_rad_m": 402.9988291766173,
+            "beta_imag_rad_m": 6.472858132310492
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 44.83157465741787,
+            "line_impedance_imag_ohm": 0.05920723180330616,
+            "beta_real_rad_m": 461.9894834224514,
+            "beta_imag_rad_m": 0.14488376053885002
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 44.48533307008536,
+            "line_impedance_imag_ohm": 0.547207980469618,
+            "beta_real_rad_m": 759.3393016985576,
+            "beta_imag_rad_m": 7.984031158690228
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 45.111760029333325,
+            "line_impedance_imag_ohm": -0.1697033022529046,
+            "beta_real_rad_m": 407.3954496727447,
+            "beta_imag_rad_m": -1.5108650194703215
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 44.581709251641804,
+            "line_impedance_imag_ohm": 0.11575948819067253,
+            "beta_real_rad_m": 460.6058708113046,
+            "beta_imag_rad_m": 0.4168615413462664
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 44.77408471288274,
+            "line_impedance_imag_ohm": 0.31333628965938126,
+            "beta_real_rad_m": 763.7841966581252,
+            "beta_imag_rad_m": 3.0541198712766815
+          }
+        ]
+      }
+    ]
+  },
+  "ro_loss": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.0442433211654332,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 48.1578465817616,
+            "line_impedance_imag_ohm": 0.4882099816091762,
+            "beta_real_rad_m": 369.2095601096108,
+            "beta_imag_rad_m": 1.9199756467761597
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 49.07076421560018,
+            "line_impedance_imag_ohm": 0.4510094538080485,
+            "beta_real_rad_m": 429.9713962868669,
+            "beta_imag_rad_m": 2.2606362626017336
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 48.54638959174646,
+            "line_impedance_imag_ohm": 0.3656764904411842,
+            "beta_real_rad_m": 703.9184638885879,
+            "beta_imag_rad_m": 1.1871696658942896
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 48.28988058129828,
+            "line_impedance_imag_ohm": 0.909976442642233,
+            "beta_real_rad_m": 370.50356818382653,
+            "beta_imag_rad_m": 5.6684202378408575
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 48.51755744623378,
+            "line_impedance_imag_ohm": -0.01028992766465013,
+            "beta_real_rad_m": 425.82120724041175,
+            "beta_imag_rad_m": -1.4042768031352548
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 49.262142384726644,
+            "line_impedance_imag_ohm": 1.7964809695064903,
+            "beta_real_rad_m": 695.450546285433,
+            "beta_imag_rad_m": -21.65700862245422
+          }
+        ]
+      }
+    ]
+  },
+  "fr4_like": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.1183420210699493,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 44.7181674735861,
+            "line_impedance_imag_ohm": 1.0283987389770124,
+            "beta_real_rad_m": 403.52082041431146,
+            "beta_imag_rad_m": 2.343340509170316
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 44.81158693829483,
+            "line_impedance_imag_ohm": 0.4172607807012493,
+            "beta_real_rad_m": 462.0240809680787,
+            "beta_imag_rad_m": -3.023301881918708
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 44.5306633142952,
+            "line_impedance_imag_ohm": 0.7865847696515348,
+            "beta_real_rad_m": 760.2814818659732,
+            "beta_imag_rad_m": 5.331046692006561
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 45.065323552271295,
+            "line_impedance_imag_ohm": 0.33859031667761624,
+            "beta_real_rad_m": 406.9039456492809,
+            "beta_imag_rad_m": -3.63920620017108
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 44.60675231706476,
+            "line_impedance_imag_ohm": 0.46652333486997777,
+            "beta_real_rad_m": 460.68042336168037,
+            "beta_imag_rad_m": -3.0095878439503077
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 44.777608008286734,
+            "line_impedance_imag_ohm": 0.5184566039757582,
+            "beta_real_rad_m": 764.0782610843744,
+            "beta_imag_rad_m": -0.22133483676447413
+          }
+        ]
+      }
+    ]
+  },
+  "thickness_0p125": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.2478489520066358,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 39.71329240019377,
+            "line_impedance_imag_ohm": 0.28481610489218195,
+            "beta_real_rad_m": 373.3595612441309,
+            "beta_imag_rad_m": 2.1833659391926936
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 40.15962128823514,
+            "line_impedance_imag_ohm": 0.07451952361577394,
+            "beta_real_rad_m": 431.4967884784463,
+            "beta_imag_rad_m": 0.5813195947164529
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 39.920406667371054,
+            "line_impedance_imag_ohm": 0.19281466282314164,
+            "beta_real_rad_m": 711.4036169250282,
+            "beta_imag_rad_m": 1.7917015159005507
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 39.95741537129195,
+            "line_impedance_imag_ohm": 0.6611231020297675,
+            "beta_real_rad_m": 375.7922533642512,
+            "beta_imag_rad_m": 5.906017184683049
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 39.88404918500172,
+            "line_impedance_imag_ohm": -0.019407772001550957,
+            "beta_real_rad_m": 428.86099989406983,
+            "beta_imag_rad_m": -0.3737912893997808
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 40.0784686457279,
+            "line_impedance_imag_ohm": 0.2427147046927234,
+            "beta_real_rad_m": 710.5359873787132,
+            "beta_imag_rad_m": -1.2190022326845205
+          }
+        ]
+      }
+    ]
+  },
+  "thickness_0p4": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.5191225854570778,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 79.04695416763502,
+            "line_impedance_imag_ohm": 1.57120273016611,
+            "beta_real_rad_m": 362.5370833594133,
+            "beta_imag_rad_m": 5.633981841077884
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 81.59191605022305,
+            "line_impedance_imag_ohm": 3.923737815337421,
+            "beta_real_rad_m": 429.19132208227717,
+            "beta_imag_rad_m": 19.03715530564924
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 81.25077119670553,
+            "line_impedance_imag_ohm": 2.1050965531260166,
+            "beta_real_rad_m": 687.321783132025,
+            "beta_imag_rad_m": -3.680928673560444
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 78.72035040909373,
+            "line_impedance_imag_ohm": 2.58624318420105,
+            "beta_real_rad_m": 362.33975690085407,
+            "beta_imag_rad_m": 10.333931933694823
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 82.07783030782642,
+            "line_impedance_imag_ohm": -0.2800175588319122,
+            "beta_real_rad_m": 432.88853098713736,
+            "beta_imag_rad_m": -2.9307800841504377
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 79.67752735216344,
+            "line_impedance_imag_ohm": -0.28328065344759296,
+            "beta_real_rad_m": 709.5346817045734,
+            "beta_imag_rad_m": 9.130289599055436
+          }
+        ]
+      }
+    ]
+  },
+  "baseline_r4": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.0287159857271406,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 48.98699980568108,
+            "line_impedance_imag_ohm": 0.45559510163945965,
+            "beta_real_rad_m": 367.38181628551524,
+            "beta_imag_rad_m": 2.589181800541623
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 50.001066820133076,
+            "line_impedance_imag_ohm": 0.43557436940743965,
+            "beta_real_rad_m": 428.59114335495707,
+            "beta_imag_rad_m": 3.2672647287642547
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 49.419502060484824,
+            "line_impedance_imag_ohm": 0.3198360557445389,
+            "beta_real_rad_m": 700.8299075520287,
+            "beta_imag_rad_m": 1.5031212957441071
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 49.10069765476371,
+            "line_impedance_imag_ohm": 0.7714397127182094,
+            "beta_real_rad_m": 368.384336292725,
+            "beta_imag_rad_m": 5.879942957133718
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 49.37738954864908,
+            "line_impedance_imag_ohm": -0.10235356787395841,
+            "beta_real_rad_m": 423.9290997801925,
+            "beta_imag_rad_m": -0.7350550520369431
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 46.316959810041894,
+            "line_impedance_imag_ohm": -1.4243131603849333,
+            "beta_real_rad_m": 749.7086052414014,
+            "beta_imag_rad_m": 26.732451221143187
+          }
+        ]
+      }
+    ]
+  },
+  "epsilon_4p4_r4": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.1078098343232343,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 45.52652274508443,
+            "line_impedance_imag_ohm": 0.7645281422125255,
+            "beta_real_rad_m": 401.10694397847095,
+            "beta_imag_rad_m": 6.51728754149627
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 45.65472398709667,
+            "line_impedance_imag_ohm": 0.03568040114395024,
+            "beta_real_rad_m": 459.7499148762699,
+            "beta_imag_rad_m": 0.040746305246162386
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 45.352005326950284,
+            "line_impedance_imag_ohm": 0.5030705617588195,
+            "beta_real_rad_m": 756.4105613180795,
+            "beta_imag_rad_m": 6.984658255187579
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 46.02803704183991,
+            "line_impedance_imag_ohm": -0.11388244814980987,
+            "beta_real_rad_m": 405.87826763142834,
+            "beta_imag_rad_m": -1.0747178554045085
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 45.436456950881066,
+            "line_impedance_imag_ohm": 0.12166112367468356,
+            "beta_real_rad_m": 458.1669450492602,
+            "beta_imag_rad_m": 0.11942664289344204
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 45.614886041941276,
+            "line_impedance_imag_ohm": 0.3046389523780477,
+            "beta_real_rad_m": 760.1623714940685,
+            "beta_imag_rad_m": 2.7451319943069024
+          }
+        ]
+      }
+    ]
+  },
+  "fr4_like_r4": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.101449768038764,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 45.53269045570864,
+            "line_impedance_imag_ohm": 1.054337400982474,
+            "beta_real_rad_m": 401.262349579887,
+            "beta_imag_rad_m": 2.2789824100542746
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 45.65176928221973,
+            "line_impedance_imag_ohm": 0.4006836396246795,
+            "beta_real_rad_m": 459.8377395815473,
+            "beta_imag_rad_m": -3.018480622096204
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 45.38407609567474,
+            "line_impedance_imag_ohm": 0.7368679197627713,
+            "beta_real_rad_m": 757.1068407601194,
+            "beta_imag_rad_m": 4.203487170258918
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 45.92293292373213,
+            "line_impedance_imag_ohm": 0.3985074566568463,
+            "beta_real_rad_m": 405.15669843661453,
+            "beta_imag_rad_m": -3.405552927454537
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 45.442764685696034,
+            "line_impedance_imag_ohm": 0.45228096109398447,
+            "beta_real_rad_m": 458.22199834684284,
+            "beta_imag_rad_m": -2.8963640771088777
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 45.618902161192864,
+            "line_impedance_imag_ohm": 0.5146292192528088,
+            "beta_real_rad_m": 760.3960274128559,
+            "beta_imag_rad_m": -0.5102459398608028
+          }
+        ]
+      }
+    ]
+  },
+  "thickness_0p125_r4": {
+    "max_complex_difference_from_saved_S": 0.0,
+    "incident_condition_max": 1.2243798473419945,
+    "line_diagnostics": [
+      {
+        "excitation": 1,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 40.55288875135481,
+            "line_impedance_imag_ohm": 0.30095119379244545,
+            "beta_real_rad_m": 371.55967117086504,
+            "beta_imag_rad_m": 2.562844712979849
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 40.986222540782705,
+            "line_impedance_imag_ohm": 0.045497371149078446,
+            "beta_real_rad_m": 429.6220867507418,
+            "beta_imag_rad_m": 0.4874524950960437
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 40.71465713523183,
+            "line_impedance_imag_ohm": 0.1890568933091142,
+            "beta_real_rad_m": 708.0949437708671,
+            "beta_imag_rad_m": 1.5709766344153997
+          }
+        ]
+      },
+      {
+        "excitation": 2,
+        "samples": [
+          {
+            "frequency_GHz": 10.5,
+            "line_impedance_real_ohm": 40.67532572482984,
+            "line_impedance_imag_ohm": 0.6333395955161633,
+            "beta_real_rad_m": 373.1528541017148,
+            "beta_imag_rad_m": 5.603163310926615
+          },
+          {
+            "frequency_GHz": 12.0,
+            "line_impedance_real_ohm": 40.68023904878015,
+            "line_impedance_imag_ohm": -0.022147057614216818,
+            "beta_real_rad_m": 426.9272827271878,
+            "beta_imag_rad_m": -0.23741743719660044
+          },
+          {
+            "frequency_GHz": 20.0,
+            "line_impedance_real_ohm": 40.921340813297554,
+            "line_impedance_imag_ohm": 0.2986928495267315,
+            "beta_real_rad_m": 706.4862212210269,
+            "beta_imag_rad_m": -2.3289870285259417
+          }
+        ]
+      }
+    ]
+  }
+}

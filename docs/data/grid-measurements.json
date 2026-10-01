@@ -1,0 +1,218 @@
+{
+  "source_sha256": {
+    "sources/p2-image-55.png": "ff765d4356568c87a044e197d411dba455c31e4f737816f1f9249858285ba1c7",
+    "sources/p3-image-60.png": "be0d48ab467f80cb2bec331c410949fcb4b338d52c0195ad65815c23bee5eed5"
+  },
+  "figure2": {
+    "top_scan_y": 608,
+    "right_scan_x": 880,
+    "top_intervals": [
+      [
+        563,
+        576
+      ],
+      [
+        584,
+        596
+      ],
+      [
+        603,
+        615
+      ],
+      [
+        622,
+        634
+      ],
+      [
+        642,
+        654
+      ],
+      [
+        661,
+        673
+      ],
+      [
+        681,
+        693
+      ],
+      [
+        700,
+        712
+      ],
+      [
+        719,
+        731
+      ],
+      [
+        739,
+        751
+      ],
+      [
+        758,
+        770
+      ],
+      [
+        777,
+        789
+      ],
+      [
+        797,
+        809
+      ],
+      [
+        816,
+        828
+      ],
+      [
+        836,
+        848
+      ],
+      [
+        855,
+        868
+      ]
+    ],
+    "right_intervals": [
+      [
+        622,
+        634
+      ],
+      [
+        642,
+        653
+      ],
+      [
+        661,
+        673
+      ],
+      [
+        680,
+        692
+      ],
+      [
+        700,
+        711
+      ],
+      [
+        719,
+        731
+      ],
+      [
+        738,
+        750
+      ],
+      [
+        758,
+        770
+      ],
+      [
+        777,
+        789
+      ],
+      [
+        797,
+        808
+      ],
+      [
+        816,
+        828
+      ],
+      [
+        836,
+        847
+      ],
+      [
+        855,
+        866
+      ],
+      [
+        874,
+        886
+      ],
+      [
+        893,
+        905
+      ],
+      [
+        913,
+        925
+      ]
+    ],
+    "top_count": 16,
+    "right_count": 16
+  },
+  "figure3": {
+    "rectangle": [
+      488,
+      49,
+      760,
+      321
+    ],
+    "candidate_fits": [
+      {
+        "candidate": 16,
+        "pitch_image_pixels": 17.0,
+        "classified_pixels": 69705,
+        "minimum_disagreeing_pixels": 4439,
+        "disagreement_fraction": 0.06368266264973818
+      },
+      {
+        "candidate": 18,
+        "pitch_image_pixels": 15.11111111111111,
+        "classified_pixels": 69705,
+        "minimum_disagreeing_pixels": 13899,
+        "disagreement_fraction": 0.19939746072735098
+      }
+    ],
+    "transition_counts": {
+      "y": {
+        "internal_boundaries": [
+          69,
+          86,
+          103,
+          120,
+          137,
+          154,
+          170,
+          188,
+          204,
+          221,
+          238,
+          255,
+          272,
+          288,
+          305
+        ],
+        "count": 15,
+        "fitted_pitch_pixels": 16.857142857142847,
+        "fitted_origin_pixels": 52.47619047619048
+      },
+      "x": {
+        "internal_boundaries": [
+          506,
+          523,
+          540,
+          556,
+          573,
+          590,
+          607,
+          624,
+          641,
+          658,
+          675,
+          692,
+          708,
+          725,
+          742
+        ],
+        "count": 15,
+        "fitted_pitch_pixels": 16.871428571428538,
+        "fitted_origin_pixels": 489.0285714285714
+      }
+    },
+    "existing_mask_identical": true,
+    "metal_cells": 132
+  },
+  "interpretation": "Figure-based inference: 18x18 input representation comprises 16x16 interior plus a one-cell peripheral terminal representation. The original serialized bit encoding is not supplied.",
+  "caveat": "Raster fit measures image consistency, not HFSS reproduction or author confirmation. Coloured annotations and antialiased transition pixels are excluded from fit scoring."
+}

@@ -1,99 +1,61 @@
 # Dall-EM マスク回路シミュレータ
 
-16×16の金属マスクを入力し、openEMSで2ポート回路の周波数特性を計算するPythonライブラリです。S11・S12・S21・S22の複素値、振幅・位相、通過帯域の指標を返します。配布名は `dall-em`、import名は `rf_repro` です。
+16×16の二値金属マスクから、openEMSで2ポート回路の複素Sパラメータを計算するPythonライブラリです。配布名は `dall-em`、import名は `rf_repro`、CLIは `rf-repro` です。
 
-Guoらの論文 *Dall-EM*（IMS 2025）の図3(a)をモデル化したシミュレータで、拡散モデルの学習・マスク生成は含みません。
+目的は、Guoらの論文 *Dall-EM*（IMS 2025）図3(a)の回路を独立した電磁界ソルバで評価し、マスクの周波数応答を再計算できる基盤を作ることです。公開資料で確定できない条件は仮定として扱い、計算の数値的な安定性と原論文との一致を別々に評価します。
 
-## インストール
+## 実装と採用方針
 
-Python 3.12と `uv` を使います。リポジトリのルートで実行してください。
+マスクの読み込み、基板・給電・短絡のモデル化、両ポートの独立励振、全S行列の抽出、CSV・Touchstone・JSONの保存を実装しています。公開APIの利用例として、ターゲットS21との差を単一のfloatで返す採点スクリプトを用意しています。
+
+| 項目 | 採用方針 |
+|---|---|
+| 材料 | 無損失RO4350B相当：εr=3.66、基板厚0.16764 mm、誘電体導電率0、PEC厚35 µm |
+| 格子・周波数 | 画素9分割・基板16分割。10–30 GHzの401点 |
+| 入力 | 内側16×16、1＝金属、0＝空白。給電・短絡は設定から付加 |
+| ターゲット採点 | 線形振幅 `abs(S21)` のRMSE。ターゲットの各点を等重みで評価 |
+| 再現性の比較対象 | 原論文図3(a)のHFSS曲線。先行COMSOLは条件差を調べる参考資料 |
+
+無損失RO相当は基準モデルとしての近似です。実際の基板・銅の損失や分散を表した材料モデルではありません。拡散モデルの学習、マスク生成、最適化、基板製造、実測は今回の実装範囲に含めません。厳密な受動性の電力超過をゼロまで追求する作業も対象外とし、残差は検証結果に記載します。
+
+## 分かったことと未解決のこと
+
+図3(a)の採用モデルでは、画素8→9分割の最大複素S差が0.011985となり、設定した格子差の基準0.02を満たしました。材料の感度試験では、4分割格子で比較した4条件のうち、原論文HFSSの読取範囲全体に対する誤差が最小だった無損失RO相当を採用しています。
+
+原論文の定量再現は未達です。下降側−3 dB交差は本実装15.782 GHz、原論文約15.600 GHzですが、10.5 GHzのS21には約2.96 dBの透過不足が残ります。厳密な受動性も未達で、最細格子での境界距離依存、原論文の未公開条件、任意マスクの精度は未確認です。APIの正常終了だけで、これらの検証を済ませたとは扱いません。
+
+## 文書
+
+| 文書 | 内容 |
+|---|---|
+| [検証レポート](docs/reproduction-report.md) | 背景と目的、結果と未達事項、実験計画と結果、参考資料 |
+| [利用方法](docs/usage.md) | 導入、マスクと設定、Python API、CLI、RMSE採点、開発時の確認 |
+| [検証データ](docs/data/README.md) | レポートの掲載数値と図を確認する入力データ・出典 |
+
+## 保存済み応答で試す
+
+Python 3.12と `uv` を使い、リポジトリのルートで実行します。この例では、同梱の完了済み応答を使うためネイティブソルバは不要です。`--out` は未使用のディレクトリにしてください。
 
 ```bash
 uv sync --locked --inexact
-uv run rf-repro --help
-```
-
-これで入力処理、保存済み結果の読み込み・再利用、CLIが使えます。`src/rf_repro/` をインストールする構成で、`PYTHONPATH` の設定は不要です。標準設定とマスク例はwheelに同梱します。
-
-新規シミュレーションと波形の再処理には、openEMS・CSXCADのネイティブライブラリとPythonバインディングが必要です。Ubuntu 24.04／x86_64で、`git`、`cmake`、C/C++コンパイラ、Python 3.12開発ヘッダを用意して実行します。
-
-```bash
-mkdir -p tmp/setup
-bash scripts/bootstrap.sh > tmp/setup/bootstrap.log 2>&1
 source env.sh
+uv run rf-repro evaluate --mask examples/data/fig3a-mask.csv --out tmp/example-response --reuse-run tests/fixtures/completed-run
+uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --target examples/data/lowpass-target.csv --out tmp/example-score --reuse-run tests/fixtures/completed-run
 ```
 
-固定版openEMS-Project v0.0.36とサブモジュールをビルドします。ダウンロード・ビルド用ファイルは `tmp/native-build/`、導入済みライブラリとwheelは `.native/`、Python環境は `.venv/` に保存します。約5 GBの空き領域が必要です。Ubuntuの依存パッケージはダウンロード・展開のみ行い、システムにはインストールしません。
+採点コマンドは標準でRMSEの `0.20037665494010062` を1行で出力します。ターゲット例は10–15 GHzを振幅1、16–30 GHzを振幅0とする理想ローパスです。この値は理想ターゲットへの線形振幅誤差であり、原論文HFSSへのdB誤差とは評価対象が異なります。
 
-ネイティブバインディングはローカルビルドしたwheelから追加導入するため、環境の再同期には `uv sync --locked --inexact` を使ってください。`.venv` を作り直した場合は `uv pip install --python .venv/bin/python .native/wheels/*.whl` で再導入できます。実際のネイティブ版はopenEMS 0.0.36／CSXCAD 0.6.3ですが、上流wheelのメタデータは0.0.33／0.6.2です。
+新規シミュレーションにはopenEMS・CSXCADのネイティブ環境が必要です。[導入と実行の手順](docs/usage.md)に従って構築してください。
 
-`env.sh` は共有ライブラリの参照先を設定します。既存の外部導入先を使う場合は、sourceする前に `RF_REPRO_NATIVE` をそのパスへ設定してください。
-
-## CLI
-
-```bash
-source env.sh
-uv run rf-repro evaluate --mask examples/data/fig3a-mask.csv --out tmp/my-circuit
-# python -m からも同じCLIを呼べます。
-uv run python -m rf_repro --help
-# 形状・メッシュの確認のみ。
-uv run rf-repro inspect --config examples/configs/paper_corrected.yaml --out tmp/inspect-paper
-```
-
-`--out` には未使用のディレクトリを指定します。新規解析は同期処理で、標準の細密格子では数十分以上かかります。成功時は標準出力と出力先の `response.json` に結果を返します。失敗時は非ゼロ終了とエラーJSONになり、不完全な結果を成功として返しません。
-
-既存の解析を再利用する場合は `--reuse-run /path/to/completed-run` を指定します。入力マスクと解析・計測設定の一致を検査します。ソルバを使わずに試す例です。
-
-```bash
-uv run rf-repro evaluate --mask examples/data/fig3a-mask.csv --out tmp/reuse-example --reuse-run tests/fixtures/completed-run
-```
-
-`run`、`postprocess`、`compare`、`convergence` も `rf-repro` から利用できます。条件変更には `--config` でYAMLを指定します。YAMLの `geometry.file` はそのYAMLを基準とする相対パスです。
-
-## Python API
-
-```python
-import numpy as np
-from rf_repro import evaluate_mask, load_response
-
-mask = np.loadtxt("examples/data/fig3a-mask.csv", delimiter=",", dtype=int)
-result = evaluate_mask(mask, "tmp/python-example")
-frequency_GHz = result.frequency_Hz / 1e9
-s21 = result.s[:, 1, 0]  # 周波数、出力ポート、入力ポートの順
-print(result.metrics["first_downward_3dB_GHz"])
-saved = load_response("tmp/python-example")
-```
-
-`evaluate_mask(mask, out_dir, *, config_path=None, reuse_run=None)` は標準で10–30 GHzの401点を計算します。`result.s` は複素配列 `(周波数点数, 2, 2)`、`result.to_dict()` はJSON化可能な辞書です。両方向の正常終了と減衰条件を満たさない結果は `SimulationError` になります。
-
-| 項目 | 仕様 |
-|---|---|
-| 入力 | 16×16のNumPy配列、二次元リスト、CSV、JSON配列、白黒PNG |
-| マスク値 | 1＝金属、0＝空白。PNGは黒＝金属。灰色や非二値入力は拒否 |
-| 向き | 行0が+y、列0が−x、中心原点 |
-| 標準条件 | 1セル0.125 mm、2 mm角。基板・給電・短絡は設定から付加 |
-| JSON | 実部・虚部・dB振幅・度単位の位相、回路指標、マスク、実効設定、保存先 |
-
-18×18の端子込み学習表現から16×16への自動変換は行いません。APIによる単一評価はメッシュ収束を自動検査しません。再利用応答は元の解析ディレクトリを参照するため、そのディレクトリも保持してください。
-
-## 開発・検証
-
-```bash
-uv run python -m unittest discover -s tests -v
-uv run python tests/check_geometry.py
-uv run python tests/check_network_extraction.py
-uv build --out-dir tmp/dist
-```
-
-テスト用の保存済み応答は `tests/fixtures/completed-run/` に含めています。契約テストにネイティブソルバや過去の `tmp/` は不要です。新たな検証出力は `tmp/` に保存します。
+## ディレクトリ構成
 
 | 場所 | 内容 |
 |---|---|
-| [src/rf_repro](src/rf_repro/) | シミュレータ、Python API、CLI、同梱標準設定 |
-| [pyproject.toml](pyproject.toml)・[uv.lock](uv.lock) | ビルド設定・Python依存管理 |
-| [examples](examples/) | 編集して使える設定・マスク例 |
-| [scripts](scripts/) | ネイティブ環境の構築手順 |
-| [tests](tests/) | API契約テスト・検証用fixture |
-| tmp/ | 作業用ファイル、実行結果、確認記録 |
+| [src/rf_repro](src/rf_repro/) | ライブラリ、API、CLI、同梱標準設定とマスク |
+| [examples](examples/) | 利用側のスクリプト、編集用設定、マスクとターゲット例 |
+| [tests](tests/) | 保守するテストと保存済み応答のfixture |
+| [scripts](scripts/) | ネイティブ環境の構築 |
+| [docs](docs/) | 現在の利用仕様と検証結果、掲載図 |
+| `tmp/`（Git管理外） | 作業用ファイル、実行結果、検証の証拠 |
 
-従来の解析結果・レポートは [tmp/rf-repro/REPORT.md](tmp/rf-repro/REPORT.md) に残しています。過去の文書・スクリプト内のパスは実行当時の記録です。図3(a)の採用形状では最後の2段階の最大複素S差0.011985を確認しましたが、厳密な受動性と論文条件の完全一致は未達です。これらの記録はライブラリの実行には不要です。
+ライブラリとテストは、過去の `tmp/` に依存しません。`tmp/` はリポジトリに含めず、必要に応じて作成します。レポートの掲載データは `docs/data/`、現在の実行手順は[利用方法](docs/usage.md)で管理します。

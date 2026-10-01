@@ -1,0 +1,54 @@
+[
+  {
+    "excitation": 1,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/user/vibe/dall-em/tmp/feed-transition-study/no-shorts/resources-1.txt",
+      "uv",
+      "run",
+      "--no-project",
+      "--python",
+      "/home/user/vibe/dall-em/.venv/bin/python3",
+      "-m",
+      "rf_repro",
+      "worker",
+      "--run",
+      "/home/user/vibe/dall-em/tmp/feed-transition-study/no-shorts",
+      "--excitation",
+      "1"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 523.9321982529946,
+    "normal_finish": true,
+    "decay_confirmed": false,
+    "caution": "Inspect solver log; energy criterion is independent of mesh convergence"
+  },
+  {
+    "excitation": 2,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/user/vibe/dall-em/tmp/feed-transition-study/no-shorts/resources-2.txt",
+      "uv",
+      "run",
+      "--no-project",
+      "--python",
+      "/home/user/vibe/dall-em/.venv/bin/python3",
+      "-m",
+      "rf_repro",
+      "worker",
+      "--run",
+      "/home/user/vibe/dall-em/tmp/feed-transition-study/no-shorts",
+      "--excitation",
+      "2"
+    ],
+    "exit_code": 1,
+    "wall_seconds": 0.4686754709982779,
+    "normal_finish": false,
+    "decay_confirmed": false,
+    "caution": "Inspect solver log; energy criterion is independent of mesh convergence"
+  }
+]

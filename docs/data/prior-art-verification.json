@@ -1,0 +1,24 @@
+{
+  "mesh_max_complex_delta": 0.011985330633252113,
+  "passband_s21_max_delta_dB": 0.025838242424624625,
+  "feature_relative_percent": 0.10115634933523772,
+  "max_coherent_power": 1.004539833147887,
+  "max_reciprocity_error": 0.0007444913485949264,
+  "snapshot_identical": {
+    "model.py": true,
+    "geometry.py": true,
+    "postprocess.py": true
+  },
+  "screenshot_mask": {
+    "method": "centre samples: x boundaries 469..958, y 183..673; blue minus red >15",
+    "metal_cells": 132,
+    "different_cells": 0,
+    "different_indices": [],
+    "source": "Pasted image 20250624230932.png"
+  },
+  "production_extraction_synthetic_max_error": 1.1102230246251565e-16,
+  "single_excitation_counterexample": {
+    "true_s22": "0.1j",
+    "b2_over_a2_excitation1": "(4+0.10000000000000002j)"
+  }
+}

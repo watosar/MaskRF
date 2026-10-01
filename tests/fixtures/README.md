@@ -1,5 +1,9 @@
 # 完了済み応答のfixture
 
-`completed-run/` は移行前の `tmp/rf-repro/results/paper-refine-9-01/` から、API契約テストに必要な5ファイルを保存したものです。全401点・全S成分の順序、再利用条件、数値の保持を検査します。ソルバ波形は含まず、再解析には使いません。
+`completed-run/` は、図3(a)の採用設定（無損失RO相当・画素9分割）で正常終了・減衰を確認した応答のfixtureです。全401点・全S成分の順序、入力と設定の再利用条件、数値の保持、ターゲット採点を検査します。ネイティブソルバや過去の `tmp/` は不要です。
 
-`effective.json` と `status.json` 内の絶対パスは実行当時の記録です。`load_response` は指定されたfixtureディレクトリのデータを読み、マスク一致判定から元のパスを除外します。
+`effective.json`、`status.json`、`metrics.json`、`sparameters.csv`、`mask.csv` の5ファイルを収録しています。ソルバ波形とTouchstoneファイルは含まないため、波形の再処理やTouchstoneの検査には使えません。APIが返すTouchstoneの参照先も、このfixtureには実体がありません。
+
+`effective.json` と `status.json` 内の絶対パスは生成元の記録です。`load_response` は指定されたfixtureディレクトリを読み、再利用の設定比較では元のマスクファイルのパスを除外します。
+
+生成元は `paper-refine-9-01`、検証範囲と物理的な限界は[検証レポート](../../docs/reproduction-report.md)に記載しています。fixtureとの一致は数値の保持を検査するもので、原論文との一致や任意マスクの精度を保証するものではありません。

@@ -1,5 +1,5 @@
 assumptions:
-- PEC metal and zero dielectric loss are preliminary approximations
+- PEC metal and zero dielectric loss are the adopted reference approximations
 - Ground spans entire bottom boundary
 - No de-embedding beyond MSL measurement-plane placement
 - AC ground modelled as solid square PEC short through substrate, width one pixel

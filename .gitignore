@@ -9,17 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
-# Work artifacts are versioned; reproducible dependencies and scratch files are not.
-/tmp/commit-prep/
-/tmp/rf-repro/apt/
-/tmp/rf-repro/native/
-/tmp/rf-repro/build/
-/tmp/rf-repro/sources/openEMS-Project/
-/tmp/rf-repro/.mpl/
+# Temporary work files, run outputs, and local records
+/tmp/
 
-# Installed native runtime and disposable native builds
+# Installed native runtime
 /.native/
-/tmp/native-build/
-/tmp/matplotlib/
-/tmp/src-layout-migration/dist/
-/tmp/src-layout-migration/wheel-env/

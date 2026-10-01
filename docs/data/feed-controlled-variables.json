@@ -1,0 +1,6 @@
+{
+  "only_physical_difference": "width of 0.125 mm end section: 0.35 vs 0.125 mm",
+  "all_other_settings_equal": true,
+  "mesh_lines_identical": true,
+  "experimental_library": "/home/user/vibe/dall-em/tmp/feed-transition-study/experimental/rf_repro"
+}

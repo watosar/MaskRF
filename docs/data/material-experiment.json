@@ -1,0 +1,204 @@
+{
+  "cases": {
+    "baseline": {
+      "substrate": {
+        "conductivity_S_m": 0.0,
+        "epsilon_r": 3.66,
+        "thickness_mm": 0.16764
+      },
+      "mesh": {
+        "edge_rule": "thirds",
+        "local_mm": 0.0125,
+        "max_mm": 0.2,
+        "pixel_subdivisions": 2,
+        "probe_step_mm": 0.025,
+        "substrate_cells": 4,
+        "verify_feed_edges": true
+      },
+      "rationale": "existing material approximation",
+      "loss_tangent_reference": 0.0,
+      "loss_reference_frequency_Hz": 10000000000.0,
+      "loss_tangent_at_10_20_30_GHz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cells": 256256,
+      "cell_counts": [
+        182,
+        64,
+        22
+      ]
+    },
+    "epsilon_4p4": {
+      "substrate": {
+        "conductivity_S_m": 0.0,
+        "epsilon_r": 4.4,
+        "thickness_mm": 0.16764
+      },
+      "mesh": {
+        "edge_rule": "thirds",
+        "local_mm": 0.0125,
+        "max_mm": 0.2,
+        "pixel_subdivisions": 2,
+        "probe_step_mm": 0.025,
+        "substrate_cells": 4,
+        "verify_feed_edges": true
+      },
+      "rationale": "permittivity only; assumed value",
+      "loss_tangent_reference": 0.0,
+      "loss_reference_frequency_Hz": 10000000000.0,
+      "loss_tangent_at_10_20_30_GHz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cells": 256256,
+      "cell_counts": [
+        182,
+        64,
+        22
+      ]
+    },
+    "ro_loss": {
+      "substrate": {
+        "conductivity_S_m": 0.007533753525437532,
+        "epsilon_r": 3.66,
+        "thickness_mm": 0.16764
+      },
+      "mesh": {
+        "edge_rule": "thirds",
+        "local_mm": 0.0125,
+        "max_mm": 0.2,
+        "pixel_subdivisions": 2,
+        "probe_step_mm": 0.025,
+        "substrate_cells": 4,
+        "verify_feed_edges": true
+      },
+      "rationale": "loss only; RO4350B data sheet loss at 10 GHz",
+      "loss_tangent_reference": 0.0037,
+      "loss_reference_frequency_Hz": 10000000000.0,
+      "loss_tangent_at_10_20_30_GHz": [
+        0.0037000000000000006,
+        0.0018500000000000003,
+        0.0012333333333333335
+      ],
+      "cells": 256256,
+      "cell_counts": [
+        182,
+        64,
+        22
+      ]
+    },
+    "fr4_like": {
+      "substrate": {
+        "conductivity_S_m": 0.04895660243970631,
+        "epsilon_r": 4.4,
+        "thickness_mm": 0.16764
+      },
+      "mesh": {
+        "edge_rule": "thirds",
+        "local_mm": 0.0125,
+        "max_mm": 0.2,
+        "pixel_subdivisions": 2,
+        "probe_step_mm": 0.025,
+        "substrate_cells": 4,
+        "verify_feed_edges": true
+      },
+      "rationale": "assumed FR4-like permittivity and loss; not the COMSOL setup",
+      "loss_tangent_reference": 0.02,
+      "loss_reference_frequency_Hz": 10000000000.0,
+      "loss_tangent_at_10_20_30_GHz": [
+        0.02,
+        0.01,
+        0.006666666666666667
+      ],
+      "cells": 256256,
+      "cell_counts": [
+        182,
+        64,
+        22
+      ]
+    },
+    "thickness_0p125": {
+      "substrate": {
+        "conductivity_S_m": 0.0,
+        "epsilon_r": 3.66,
+        "thickness_mm": 0.125
+      },
+      "mesh": {
+        "edge_rule": "thirds",
+        "local_mm": 0.0125,
+        "max_mm": 0.2,
+        "pixel_subdivisions": 2,
+        "probe_step_mm": 0.025,
+        "substrate_cells": 3,
+        "verify_feed_edges": true
+      },
+      "rationale": "thinner substrate; assumed thickness",
+      "loss_tangent_reference": 0.0,
+      "loss_reference_frequency_Hz": 10000000000.0,
+      "loss_tangent_at_10_20_30_GHz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cells": 244608,
+      "cell_counts": [
+        182,
+        64,
+        21
+      ]
+    },
+    "thickness_0p4": {
+      "substrate": {
+        "conductivity_S_m": 0.0,
+        "epsilon_r": 3.66,
+        "thickness_mm": 0.4
+      },
+      "mesh": {
+        "edge_rule": "thirds",
+        "local_mm": 0.0125,
+        "max_mm": 0.2,
+        "pixel_subdivisions": 2,
+        "probe_step_mm": 0.025,
+        "substrate_cells": 10,
+        "verify_feed_edges": true
+      },
+      "rationale": "thicker substrate; assumed thickness",
+      "loss_tangent_reference": 0.0,
+      "loss_reference_frequency_Hz": 10000000000.0,
+      "loss_tangent_at_10_20_30_GHz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cells": 314496,
+      "cell_counts": [
+        182,
+        64,
+        27
+      ]
+    }
+  },
+  "source_sha256_before": {
+    "src/rf_repro/__init__.py": "073493f70a448096f589130e0facb0b89f99c157d20724cac86d7af764db1df5",
+    "src/rf_repro/__main__.py": "6e4db258ef927639d2b0f8a1530401e18534865a182808809e45d7ef93d02ce3",
+    "src/rf_repro/api.py": "87471523663f8a8b9e7f8df662edd0887fc0a4393d94f59d92b1c631d8ff1596",
+    "src/rf_repro/configs/paper_corrected.yaml": "fd6a9a94ef4367343018241529530124296dad8af8fdb96d4ea51c1c4fd8633a",
+    "src/rf_repro/data/fig3a-mask.csv": "c95677f96b5cd18d2a7d16c0bb906ce0276e0d1122947d333dab2598a54cebf9",
+    "src/rf_repro/geometry.py": "de29f350a055043a785bf465d7f08adb134aa6f8fb2c47d217b34e021e41f5bf",
+    "src/rf_repro/model.py": "a1b8371307cb7768bd1efad31d0eeaf04d0ba8551086875b101848b73950255e",
+    "src/rf_repro/postprocess.py": "74292623abfd3258f88ed4057646d82e5077f7f20841d338bb3909b37d4b9081"
+  },
+  "git_head": "3f84ee119a258c0f98e108a0d01463716a81e4ce",
+  "loss_model": "kappa=2*pi*10e9*epsilon_0*epsilon_r*tan_delta_at_10GHz",
+  "epsilon_0_F_m": 8.8541878128e-12,
+  "controlled": "mask, feed geometry, shorts, metal thickness, reference planes, boundaries and solver settings fixed",
+  "meshes": "identical for fixed thickness; x/y identical and substrate dz <=0.04191 mm for thickness sweep",
+  "comparison_sources": {
+    "comsol": "tmp/comsol-response-review/comsol-digitized.csv",
+    "paper": "tmp/rf-repro/data/fig3a-hfss-digitized.csv",
+    "standard_fine": "tmp/rf-repro/results/paper-refine-9-01"
+  }
+}

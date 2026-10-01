@@ -1,0 +1,119 @@
+"""Check target units, amplitude scoring, and the public-API consumer CLI."""
+
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+
+PROJECT = Path(__file__).resolve().parents[1]
+WORK = PROJECT / "tmp/score-mask-tests"
+WORK.mkdir(parents=True, exist_ok=True)
+SCRIPT = PROJECT / "examples/score_mask.py"
+spec = importlib.util.spec_from_file_location("score_mask_example", SCRIPT)
+example = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(example)
+
+
+class ScoreMaskTests(unittest.TestCase):
+    def test_squared_and_maximum_errors(self):
+        # Amplitude errors are 0 and .6. MSE=.18; RMSE=sqrt(.18); max=.6.
+        expected = {"mae": .3, "mse": .18, "rmse": .4242640687119285, "max": .6}
+        for metric, value in expected.items():
+            with self.subTest(metric=metric):
+                actual = example.s21_error([10e9, 12e9], [1j, -.4], [10e9, 12e9], [1, 1], metric=metric)
+                self.assertIs(type(actual), float)
+                self.assertAlmostEqual(actual, value)
+        self.assertAlmostEqual(example.s21_error([10e9, 12e9], [1j, -.4], [10e9, 12e9], [1, 1]),
+                               expected["rmse"])
+
+    def test_mae_and_rmse_rank_candidates_differently(self):
+        frequencies = [10e9, 11e9, 12e9]
+        target = [1, 1, 1]
+        a, b = [1, 1, .4], [.75, .75, .75]
+        scores = {
+            metric: (example.s21_error(frequencies, a, frequencies, target, metric=metric),
+                     example.s21_error(frequencies, b, frequencies, target, metric=metric))
+            for metric in ("mae", "mse", "rmse", "max")
+        }
+        self.assertLess(*scores["mae"])
+        for metric in ("mse", "rmse", "max"):
+            self.assertGreater(*scores[metric])
+
+    def test_mean_absolute_magnitude_error_and_phase(self):
+        # Errors .4 and .4, averaged over two points; phases must not affect them.
+        value = example.s21_mae([10e9, 12e9], [.6j, -.4], [10e9, 12e9], [1, 0])
+        self.assertIs(type(value), float)
+        self.assertAlmostEqual(value, .4)
+        # Magnitudes .2 and .8 interpolate to .5; interpolating complex waves differs.
+        self.assertAlmostEqual(example.s21_mae([10e9, 12e9], [.2, .8j], [11e9], [.5]), 0)
+
+    def test_decibel_and_linear_target_units(self):
+        linear = example.parse_target_csv("frequency_GHz,s21_magnitude\n10,1\n12,.1\n")
+        decibel = example.parse_target_csv("frequency_GHz,s21_dB\n10,0\n12,-20\n")
+        np.testing.assert_array_equal(linear[0], [10e9, 12e9])
+        np.testing.assert_allclose(linear[1], [1, .1])
+        np.testing.assert_allclose(decibel, linear)
+
+    def test_invalid_values_and_extrapolation_are_rejected(self):
+        for frequencies, magnitudes in (([9e9], [1]), ([13e9], [1]), ([10e9, 10e9], [1, 1]),
+                                         ([12e9, 10e9], [1, 1]), ([10e9], [np.nan]), ([10e9], [-1])):
+            with self.subTest(frequencies=frequencies, magnitudes=magnitudes), self.assertRaises(ValueError):
+                example.s21_mae([10e9, 12e9], [.2, .8], frequencies, magnitudes)
+        for text in ("frequency_GHz,s21_magnitude\n", "frequency_GHz,s21_dB\n10,-inf\n",
+                     "frequency_GHz,s21_dB\n10,1e9\n", "frequency_GHz,s21_magnitude\n10,1,2\n"):
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                example.parse_target_csv(text)
+
+    def test_invalid_target_does_not_invoke_simulator(self):
+        with tempfile.TemporaryDirectory(dir=WORK) as directory:
+            target = Path(directory) / "invalid.csv"
+            target.write_text("frequency_GHz,s21_magnitude\n10,nan\n")
+            with patch.object(example, "evaluate_mask") as evaluate:
+                with self.assertRaises(ValueError):
+                    example.score_mask(np.zeros((16, 16)), target, Path(directory) / "output")
+                evaluate.assert_not_called()
+                self.assertFalse((Path(directory) / "output").exists())
+
+    def test_invalid_metric_does_not_invoke_simulator(self):
+        with patch.object(example, "evaluate_mask") as evaluate:
+            with self.assertRaisesRegex(ValueError, "Unknown metric"):
+                example.score_mask(np.zeros((16, 16)), "not-read.csv", "not-created", metric="unknown")
+            evaluate.assert_not_called()
+
+    def test_cli_uses_completed_response_and_prints_only_float(self):
+        with tempfile.TemporaryDirectory(dir=WORK) as directory:
+            out = Path(directory) / "result"
+            target = Path(directory) / "target.csv"
+            target.write_text("frequency_GHz,s21_magnitude\n10.5,1\n12,0\n")
+            result = subprocess.run([
+                "uv", "run", "python", str(SCRIPT),
+                "--mask", str(PROJECT / "examples/data/fig3a-mask.csv"),
+                "--target", str(target), "--out", str(out),
+                "--reuse-run", str(PROJECT / "tests/fixtures/completed-run"),
+            ], capture_output=True, text=True, check=True, cwd=directory)
+            value = float(result.stdout)
+            self.assertEqual(result.stdout, f"{value}\n")
+            # 60-digit Decimal reference from the fixture's real/imaginary components.
+            # |S21| at 10.5 and 12 GHz is .6364795251 and .8240304457.
+            self.assertAlmostEqual(value, .6368568563857028)
+            record = json.loads((out / "score.json").read_text())
+            self.assertEqual(record["metric"], "s21_magnitude_rmse")
+            self.assertEqual(record["sample_count"], 2)
+            self.assertEqual(record["value"], value)
+            self.assertEqual((out / "target.csv").read_bytes(), target.read_bytes())
+            self.assertEqual(json.loads((out / "response.json").read_text())["execution"], "reused")
+            direct = example.score_mask(PROJECT / "examples/data/fig3a-mask.csv", target,
+                                        Path(directory) / "python-default",
+                                        reuse_run=PROJECT / "tests/fixtures/completed-run")
+            self.assertIs(type(direct), float)
+            self.assertEqual(direct, value)
+
+
+if __name__ == "__main__":
+    unittest.main()

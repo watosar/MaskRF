@@ -1,0 +1,146 @@
+{
+  "adopted_material": {
+    "conductivity_S_m": 0,
+    "epsilon_r": 3.66,
+    "thickness_mm": 0.16764
+  },
+  "adopted_metal": {
+    "model": "PEC",
+    "thickness_mm": 0.035
+  },
+  "adopted_mesh": {
+    "edge_rule": "thirds",
+    "local_mm": 0.004166666666666667,
+    "max_mm": 0.075,
+    "pixel_subdivisions": 9,
+    "probe_step_mm": 0.025,
+    "substrate_cells": 16,
+    "verify_feed_edges": true
+  },
+  "core_identical_to_accepted_run": {
+    "model.py": true,
+    "geometry.py": true,
+    "postprocess.py": true
+  },
+  "paper_readable_range_GHz": [
+    10.059612518628912,
+    18.077496274217587
+  ],
+  "paper_cutoff_GHz": 15.59960258320914,
+  "numerical_checks": {
+    "max_complex_S_delta_8_to_9": 0.011985330633252113,
+    "passband_S21_max_delta_dB": 0.025838242424624625,
+    "cutoff_relative_change_percent": 0.10115634933523772,
+    "max_coherent_power_ratio": 1.004539833147887,
+    "max_reciprocity_error": 0.0007444913485949264,
+    "max_incident_matrix_condition": 1.0235907319704134
+  },
+  "paper_comparison": {
+    "baseline_r4": {
+      "cutoff_GHz": 15.631879559920193,
+      "rmse_dB": {
+        "passband_10p5_to_14": 1.4979858034000788,
+        "transition_14p5_to_18": 0.7826043152129626,
+        "overall_10p5_to_18": 1.1950797005593663
+      }
+    },
+    "epsilon_4p4_r4": {
+      "cutoff_GHz": 14.534855809710018,
+      "rmse_dB": {
+        "passband_10p5_to_14": 0.5566632870147548,
+        "transition_14p5_to_18": 15.903462760599883,
+        "overall_10p5_to_18": 11.2523331312421
+      }
+    },
+    "fr4_like_r4": {
+      "cutoff_GHz": 14.175325593195984,
+      "rmse_dB": {
+        "passband_10p5_to_14": 1.529177145324907,
+        "transition_14p5_to_18": 16.007581747397808,
+        "overall_10p5_to_18": 11.370599283709883
+      }
+    },
+    "thickness_0p125_r4": {
+      "cutoff_GHz": 15.372981129725108,
+      "rmse_dB": {
+        "passband_10p5_to_14": 0.8487495590333324,
+        "transition_14p5_to_18": 3.1533651092719044,
+        "overall_10p5_to_18": 2.3091218380948075
+      }
+    },
+    "standard_fine": {
+      "cutoff_GHz": 15.781893429238917,
+      "rmse_dB": {
+        "passband_10p5_to_14": 1.543564511706972,
+        "transition_14p5_to_18": 0.7045524901907942,
+        "overall_10p5_to_18": 1.1997886508121405
+      }
+    }
+  },
+  "accepted_run_samples": {
+    "10.5": {
+      "S21_dB": -3.924311251430455,
+      "paper_S21_dB": -0.965425531914894,
+      "reflection_power": 0.5901203715195772,
+      "transmission_power": 0.4051061859210838,
+      "unaccounted_power": 0.004773442559339036
+    },
+    "12": {
+      "S21_dB": -1.6811348401694137,
+      "paper_S21_dB": -0.5673758865248227,
+      "reflection_power": 0.3129248511554618,
+      "transmission_power": 0.6790261754077448,
+      "unaccounted_power": 0.008048973436793339
+    },
+    "14": {
+      "S21_dB": -0.5407756595916189,
+      "paper_S21_dB": -0.5673758865248227,
+      "reflection_power": 0.10499383213651599,
+      "transmission_power": 0.8829221944705072,
+      "unaccounted_power": 0.012083973392976732
+    },
+    "15": {
+      "S21_dB": -0.946031581851381,
+      "paper_S21_dB": -1.232269503546099,
+      "reflection_power": 0.18378725427047157,
+      "transmission_power": 0.8042606894187047,
+      "unaccounted_power": 0.011952056310823744
+    },
+    "16": {
+      "S21_dB": -3.984405178479957,
+      "paper_S21_dB": -4.982269503546099,
+      "reflection_power": 0.5783032276221578,
+      "transmission_power": 0.39953927954609736,
+      "unaccounted_power": 0.02215749283174484
+    },
+    "17": {
+      "S21_dB": -10.434557158800315,
+      "paper_S21_dB": -11.320921985815607,
+      "reflection_power": 0.8847803226172589,
+      "transmission_power": 0.09047826918749106,
+      "unaccounted_power": 0.024741408195250017
+    },
+    "20": {
+      "S21_dB": -37.00361527409912,
+      "paper_S21_dB": null,
+      "reflection_power": 0.9924297682188369,
+      "transmission_power": 0.00019936020547297082,
+      "unaccounted_power": 0.007370871575690146
+    },
+    "25": {
+      "S21_dB": -32.574416722638425,
+      "paper_S21_dB": null,
+      "reflection_power": 0.9783753757681118,
+      "transmission_power": 0.0005527876448692869,
+      "unaccounted_power": 0.02107183658701887
+    },
+    "30": {
+      "S21_dB": -25.64856298149732,
+      "paper_S21_dB": null,
+      "reflection_power": 0.9812644911214204,
+      "transmission_power": 0.0027236023601747254,
+      "unaccounted_power": 0.01601190651840483
+    }
+  },
+  "note": "Saved completed runs were checked; no new electromagnetic simulations were performed."
+}

@@ -1,0 +1,157 @@
+{
+  "source_sha256": "ac9f6bc177114bb64c503943a73bc0b0bf643b467d2aa8a64d3b7ff2c5e6ab67",
+  "axis_calibration": {
+    "x_ticks": [
+      121,
+      281,
+      442,
+      602,
+      762
+    ],
+    "f_ticks": [
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "y_ticks": [
+      49,
+      104,
+      159,
+      214,
+      269,
+      323,
+      378,
+      433,
+      487
+    ],
+    "dB_ticks": [
+      0,
+      -5,
+      -10,
+      -15,
+      -20,
+      -25,
+      -30,
+      -35,
+      -40
+    ],
+    "frequency_per_pixel": 0.031191479491845468,
+    "dB_per_pixel": -0.0912959242516105
+  },
+  "reading_uncertainty": {
+    "coordinate_pixels": 2,
+    "amplitude_dB_approx": 0.2,
+    "frequency_GHz_approx": 0.07,
+    "marker_step_GHz": 0.5,
+    "note": "Digitization uncertainty, not solver accuracy; linear interpolation between 0.5 GHz markers cannot resolve curvature."
+  },
+  "minus3dB_GHz": {
+    "comsol": 13.964910807541159,
+    "ours": 15.781893429238917,
+    "paper": 15.59960258320914
+  },
+  "selected_frequencies": [
+    {
+      "frequency_GHz": 10,
+      "comsol_s11_dB": -6.858458903559842,
+      "ours_s11_dB": -1.7144282685650216,
+      "ours_minus_comsol_s11_dB": 5.14403063499482,
+      "comsol_s21_dB": -1.289407524211601,
+      "ours_s21_dB": -4.93357072904622,
+      "ours_minus_comsol_s21_dB": -3.6441632048346193
+    },
+    {
+      "frequency_GHz": 10.5,
+      "comsol_s11_dB": -7.041050752063062,
+      "ours_s11_dB": -2.290593928413753,
+      "ours_minus_comsol_s11_dB": 4.7504568236493085,
+      "comsol_s21_dB": -1.289407524211601,
+      "ours_s21_dB": -3.924311251430455,
+      "ours_minus_comsol_s21_dB": -2.634903727218854,
+      "paper_s21_dB": -0.965425531914894
+    },
+    {
+      "frequency_GHz": 12,
+      "comsol_s11_dB": -9.597336631108156,
+      "ours_s11_dB": -5.0455994567094065,
+      "ours_minus_comsol_s11_dB": 4.55173717439875,
+      "comsol_s21_dB": -0.8785758650793536,
+      "ours_s21_dB": -1.6811348401694137,
+      "ours_minus_comsol_s21_dB": -0.8025589750900601,
+      "paper_s21_dB": -0.5673758865248227
+    },
+    {
+      "frequency_GHz": 14,
+      "comsol_s11_dB": -3.9369893275083063,
+      "ours_s11_dB": -9.788362128134324,
+      "ours_minus_comsol_s11_dB": -5.8513728006260175,
+      "comsol_s21_dB": -3.1153260092438115,
+      "ours_s21_dB": -0.5407756595916189,
+      "ours_minus_comsol_s21_dB": 2.574550349652193,
+      "paper_s21_dB": -0.5673758865248227
+    },
+    {
+      "frequency_GHz": 15,
+      "comsol_s11_dB": -1.01551975145677,
+      "ours_s11_dB": -7.356846104250918,
+      "ours_minus_comsol_s11_dB": -6.341326352794148,
+      "comsol_s21_dB": -9.323448858353323,
+      "ours_s21_dB": -0.946031581851381,
+      "ours_minus_comsol_s21_dB": 8.377417276501943,
+      "paper_s21_dB": -1.232269503546099
+    },
+    {
+      "frequency_GHz": 16,
+      "comsol_s11_dB": -0.4677442059471071,
+      "ours_s11_dB": -2.3784438380814477,
+      "ours_minus_comsol_s11_dB": -1.9106996321343406,
+      "comsol_s21_dB": -18.361745359262766,
+      "ours_s21_dB": -3.984405178479957,
+      "ours_minus_comsol_s21_dB": 14.37734018078281,
+      "paper_s21_dB": -4.982269503546099
+    },
+    {
+      "frequency_GHz": 17,
+      "comsol_s11_dB": -0.37644828169549616,
+      "ours_s11_dB": -0.5316454457664017,
+      "ours_minus_comsol_s11_dB": -0.15519716407090556,
+      "comsol_s21_dB": -37.35129760359774,
+      "ours_s21_dB": -10.434557158800315,
+      "ours_minus_comsol_s21_dB": 26.916740444797426,
+      "paper_s21_dB": -11.320921985815607
+    },
+    {
+      "frequency_GHz": 20,
+      "comsol_s11_dB": -0.4677442059471071,
+      "ours_s11_dB": -0.03300217415464361,
+      "ours_minus_comsol_s11_dB": 0.43474203179246346,
+      "comsol_s21_dB": -24.93505190537872,
+      "ours_s21_dB": -37.00361527409912,
+      "ours_minus_comsol_s21_dB": -12.068563368720397
+    },
+    {
+      "frequency_GHz": 25,
+      "comsol_s11_dB": -0.8785758650793536,
+      "ours_s11_dB": -0.09494486371001275,
+      "ours_minus_comsol_s11_dB": 0.7836310013693408,
+      "comsol_s21_dB": -16.718418722733777,
+      "ours_s21_dB": -32.574416722638425,
+      "ours_minus_comsol_s21_dB": -15.855997999904648
+    },
+    {
+      "frequency_GHz": 30,
+      "comsol_s11_dB": -6.219387433798569,
+      "ours_s11_dB": -0.08213916623659812,
+      "ours_minus_comsol_s11_dB": 6.13724826756197,
+      "comsol_s21_dB": -3.1153260092438115,
+      "ours_s21_dB": -25.64856298149732,
+      "ours_minus_comsol_s21_dB": -22.53323697225351
+    }
+  ],
+  "minus3dB_comsol_coordinate_envelope_GHz": [
+    13.834058632582675,
+    14.085990816723918
+  ]
+}

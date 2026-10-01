@@ -1,0 +1,29 @@
+{
+  "source": "sources/paper.pdf page 3 Fig.3(a), embedded image xref60",
+  "rectangle_pixels": [
+    488,
+    49,
+    760,
+    321
+  ],
+  "matrix_shape": [
+    16,
+    16
+  ],
+  "paper_text_shape": [
+    18,
+    18
+  ],
+  "interpretation": "Figure-based verification 2026-09-28: Fig.2 has 16 terminal slots per edge; Fig.3(a) has 16x16 metal interior. 18x18 is consistent with a one-cell peripheral terminal representation. Original serialized encoding not recovered.",
+  "metal": "neutral dark grey, median RGB mean <140 in 5x5 centre patch",
+  "ambiguous_cells": [],
+  "repairs": "none; diagonal contacts and islands preserved",
+  "curve_axes_pixels": [
+    1382,
+    2053,
+    68,
+    350
+  ],
+  "curve_error": "about \u00b10.15 dB and \u00b10.06 GHz (2 pixels), excluding clipping below -20 dB",
+  "grid_verification": "grid-interpretation.md"
+}

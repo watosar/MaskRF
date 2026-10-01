@@ -1,0 +1,8 @@
+{
+  "default_cli_metric": "s21_magnitude_rmse",
+  "score": 0.20037665494010062,
+  "matches_explicit_rmse": true,
+  "stdout_is_one_float": true,
+  "stderr_empty": true,
+  "new_FDTD_simulations": 0
+}

@@ -5,6 +5,7 @@ import yaml
 from .geometry import boxes,mask_audit,load_mask
 from .model import build
 from .postprocess import process,db
+from .api import _completed_excitations
 
 
 def dump(path,value):Path(path).write_text(json.dumps(value,indent=2))
@@ -80,6 +81,8 @@ def run(c,out,source=None):
                            caution='Inspect solver log; energy criterion is independent of mesh convergence'))
         dump(out/'status.json',status)
         if code:raise RuntimeError(f'Solver failed ({code}); see {out}/solver-{ex}.log')
+        if not status[-1]['decay_confirmed']:
+            raise RuntimeError(f'Solver excitation {ex} did not finish normally and satisfy its decay criterion; see {out}/solver-{ex}.log')
     process(out)
     return out
 
@@ -92,9 +95,10 @@ def compare_runs(paths,out):
     for p in paths:
         f,s,m=process(p);ax.plot(f/1e9,db(s['s21']),label=Path(p).name)
         c=json.loads((Path(p)/'effective.json').read_text());pb=c['validation']['passband_GHz'];use=(f>=pb[0]*1e9)&(f<=pb[1]*1e9)
-        row=dict(run=str(p),metrics=m,time_decay_confirmed=all(e['decay_confirmed'] for e in json.loads((Path(p)/'status.json').read_text())))
+        completed=_completed_excitations(json.loads((Path(p)/'status.json').read_text()))
+        row=dict(run=str(p),metrics=m,time_decay_confirmed=completed)
         if prev:
-            pf,ps,pm=prev
+            pf,ps,pm,previous_completed=prev
             if not np.array_equal(f,pf):raise ValueError('Frequency grids differ')
             row['max_complex_delta']=max(float(np.max(abs(s[k]-ps[k]))) for k in s)
             row['passband_s21_max_delta_dB']=float(np.max(abs(db(s['s21'])[use]-db(ps['s21'])[use])))
@@ -106,11 +110,14 @@ def compare_runs(paths,out):
             # but never use it as a claim of full complex-matrix convergence.
             row['amplitude_feature_threshold_pass']=row['numerical_threshold_pass']
             row['complex_delta_tolerance']=c['validation'].get('complex_delta_tolerance',.02)
-            row['full_s_threshold_pass']=bool(row['amplitude_feature_threshold_pass'] and
+            row['full_s_delta_threshold_pass']=bool(row['amplitude_feature_threshold_pass'] and
                 row['max_complex_delta']<=row['complex_delta_tolerance'])
+            row['both_runs_completed_and_decayed']=bool(previous_completed and completed)
+            row['full_s_threshold_pass']=bool(row['both_runs_completed_and_decayed'] and
+                row['full_s_delta_threshold_pass'])
             row['coherent_power_tolerance']=1.02
             row['coherent_passivity_threshold_pass']=bool(m['max_singular_value']**2<=1.02)
-        results.append(row);prev=(f,s,m)
+        results.append(row);prev=(f,s,m,completed)
     ax.set(xlabel='Frequency (GHz)',ylabel='S21 (dB)',ylim=(-50,2));ax.legend();ax.grid();fig.tight_layout();fig.savefig(out/'comparison.png');plt.close(fig)
     dump(out/'comparison.json',results)
 

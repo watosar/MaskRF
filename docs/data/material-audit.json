@@ -1,0 +1,122 @@
+{
+  "baseline": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 3.66,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "epsilon_4p4": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 4.4,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "ro_loss": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 3.66,
+      "conductivity_S_m": 0.007533754,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "fr4_like": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 4.4,
+      "conductivity_S_m": 0.0489566,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "thickness_0p125": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 3.66,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.125
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "thickness_0p4": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 3.66,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.4
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "baseline_r4": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 3.66,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "epsilon_4p4_r4": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 4.4,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "fr4_like_r4": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 4.4,
+      "conductivity_S_m": 0.0489566,
+      "thickness_mm": 0.16764
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  },
+  "thickness_0p125_r4": {
+    "effective_substrate_matches": true,
+    "isotropic_native_property": true,
+    "xml_values": {
+      "epsilon_r": 3.66,
+      "conductivity_S_m": 0.0,
+      "thickness_mm": 0.125
+    },
+    "mask_and_fixed_controls_match": true,
+    "short_columns_reach_metal_top": true,
+    "feed_edges_verified": true
+  }
+}

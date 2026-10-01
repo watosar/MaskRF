@@ -1,0 +1,104 @@
+[
+  {
+    "run": "results/paper-stable-01",
+    "max_complex_delta": null,
+    "max_single_port_power": 0.9970590012468958,
+    "max_coherent_power": 1.0032399426782523,
+    "max_sigma": 1.001618661306913,
+    "power_peak_GHz": 10.7,
+    "coherent_power_peak_GHz": 28.9,
+    "passivity_within_2pct": true,
+    "reciprocity_max_error": 0.0009933765524386324,
+    "first_downward_3dB_GHz": 15.634593009056005
+  },
+  {
+    "run": "results/paper-stable-fine-01",
+    "max_complex_delta": 0.0771546518016406,
+    "max_single_port_power": 0.9966312775287511,
+    "max_coherent_power": 1.0040974614911697,
+    "max_sigma": 1.002046636385338,
+    "power_peak_GHz": 10.75,
+    "coherent_power_peak_GHz": 28.25,
+    "passivity_within_2pct": true,
+    "reciprocity_max_error": 0.0006481604592287521,
+    "first_downward_3dB_GHz": 15.73444461448863,
+    "delta_peak_GHz": 15.8,
+    "delta_peak_component": "s11",
+    "complex_threshold_pass": false,
+    "passband_s21_max_delta_dB": 0.06030648956636209,
+    "s21_phase_delta_degrees_at_10_14_20_30": [
+      0.12484943818652981,
+      2.5443907378322694,
+      2.414284477758814,
+      1.4212961995348055
+    ],
+    "component_max_delta": {
+      "s11": 0.0771546518016406,
+      "s12": 0.06961332593149737,
+      "s21": 0.06961754741495828,
+      "s22": 0.0685209724750497
+    },
+    "feature_relative_change": 0.006346052109184734,
+    "full_s_threshold_pass": false
+  },
+  {
+    "run": "results/paper-refine-8-01",
+    "max_complex_delta": 0.025706013569369912,
+    "max_single_port_power": 0.996478546021728,
+    "max_coherent_power": 1.0042371786753248,
+    "max_sigma": 1.0021163498692778,
+    "power_peak_GHz": 10.75,
+    "coherent_power_peak_GHz": 28.3,
+    "passivity_within_2pct": true,
+    "reciprocity_max_error": 0.0007044530402558757,
+    "first_downward_3dB_GHz": 15.76592904198992,
+    "delta_peak_GHz": 16.2,
+    "delta_peak_component": "s11",
+    "complex_threshold_pass": false,
+    "passband_s21_max_delta_dB": 0.0220667548553366,
+    "s21_phase_delta_degrees_at_10_14_20_30": [
+      0.03914823450694894,
+      0.8310288808230422,
+      0.9242792858314873,
+      0.276604473818683
+    ],
+    "component_max_delta": {
+      "s11": 0.025706013569369912,
+      "s12": 0.02056284448920045,
+      "s21": 0.020575429846793704,
+      "s22": 0.017010383486413483
+    },
+    "feature_relative_change": 0.001996991577054336,
+    "full_s_threshold_pass": false
+  },
+  {
+    "run": "results/paper-refine-9-01",
+    "max_complex_delta": 0.011985330633252113,
+    "max_single_port_power": 0.9964748789961129,
+    "max_coherent_power": 1.004539833147887,
+    "max_sigma": 1.0022673461446736,
+    "power_peak_GHz": 10.75,
+    "coherent_power_peak_GHz": 28.35,
+    "passivity_within_2pct": true,
+    "reciprocity_max_error": 0.0007444913485949264,
+    "first_downward_3dB_GHz": 15.781893429238917,
+    "delta_peak_GHz": 16.3,
+    "delta_peak_component": "s22",
+    "complex_threshold_pass": true,
+    "passband_s21_max_delta_dB": 0.025838242424624625,
+    "s21_phase_delta_degrees_at_10_14_20_30": [
+      -0.23192984707819914,
+      0.12314439663065785,
+      0.31422948450722876,
+      -0.2421598131709431
+    ],
+    "component_max_delta": {
+      "s11": 0.011294894715134096,
+      "s12": 0.009923830571003094,
+      "s21": 0.009921990378228244,
+      "s22": 0.011985330633252113
+    },
+    "feature_relative_change": 0.0010115634933523772,
+    "full_s_threshold_pass": true
+  }
+]

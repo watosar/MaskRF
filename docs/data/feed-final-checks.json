@@ -1,0 +1,31 @@
+{
+  "baseline": {
+    "both_excitation_completed_and_decayed": true,
+    "response_shape": [
+      401,
+      2,
+      2
+    ]
+  },
+  "neck": {
+    "both_excitation_completed_and_decayed": true,
+    "response_shape": [
+      401,
+      2,
+      2
+    ]
+  },
+  "no-shorts": {
+    "rejected": true,
+    "reason": "Both excitations must finish and decay: /home/user/vibe/dall-em/tmp/feed-transition-study/no-shorts"
+  },
+  "identical_mesh_all_cases": true,
+  "experimental_source_hashes": {
+    "postprocess.py": "74292623abfd3258f88ed4057646d82e5077f7f20841d338bb3909b37d4b9081",
+    "api.py": "87471523663f8a8b9e7f8df662edd0887fc0a4393d94f59d92b1c631d8ff1596",
+    "__init__.py": "073493f70a448096f589130e0facb0b89f99c157d20724cac86d7af764db1df5",
+    "model.py": "3c88c74ef2bcb8c4c8a7e9b32800efc75d221be91ab0d87422bf4c6ff077ab83",
+    "__main__.py": "febf165ff8890f3ddadc4e01b1b6064e332e46e479ea4a0e2bc171ae6da418e6",
+    "geometry.py": "de29f350a055043a785bf465d7f08adb134aa6f8fb2c47d217b34e021e41f5bf"
+  }
+}

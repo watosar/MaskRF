@@ -18,6 +18,18 @@ class SimulationError(RuntimeError):
     """Simulation failed, is incomplete, or did not reach its decay criterion."""
 
 
+def _completed_excitations(statuses):
+    """Require both port excitations to exit normally and satisfy decay."""
+    if not isinstance(statuses, list):
+        return False
+    try:
+        return sorted(s['excitation'] for s in statuses) == [1, 2] and all(
+            s['exit_code'] == 0 and s['normal_finish'] and s['decay_confirmed']
+            for s in statuses)
+    except (KeyError, TypeError):
+        return False
+
+
 def read_mask(mask):
     """Read a 16x16 binary array, CSV, JSON array, or strictly black/white PNG."""
     if isinstance(mask, (str, Path)):
@@ -101,8 +113,7 @@ def load_response(run_dir):
                 raise SimulationError('Response refers to itself instead of a native run')
             run_dir = target
         statuses = json.loads((run_dir/'status.json').read_text())
-        if sorted(s['excitation'] for s in statuses) != [1, 2] or not all(
-                s['exit_code'] == 0 and s['normal_finish'] and s['decay_confirmed'] for s in statuses):
+        if not _completed_excitations(statuses):
             raise SimulationError(f'Both excitations must finish and decay: {run_dir}')
         config = json.loads((run_dir/'effective.json').read_text())
         mask = read_mask(run_dir/'mask.csv')

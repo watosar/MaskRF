@@ -1,0 +1,113 @@
+{
+  "paper-hfss.csv": {
+    "source_at_export": "tmp/rf-repro/data/fig3a-hfss-digitized.csv",
+    "sha256": "b7f7c82de521c904c4f03f975c30d531f1b073ccf519ff21bde673dc9dab83ea"
+  },
+  "paper-extraction.json": {
+    "source_at_export": "tmp/rf-repro/data/extraction.json",
+    "sha256": "d10424cd4da1d9a2f50f370d153f079927c7e3e5d6c86d770111ba1d72d971e2"
+  },
+  "grid-measurements.json": {
+    "source_at_export": "tmp/rf-repro/results/grid-audit-20260928/measurements.json",
+    "sha256": "dc267788908328fa7411d42e79fc9f04cf8bf1b4cbd5fd6b98e7fd41db428669"
+  },
+  "prior-art-verification.json": {
+    "source_at_export": "tmp/prior-art-review/verification.json",
+    "sha256": "e0215c267fbeae97aa7a8bf7c8bd17d13b35158bff87a3673986de0ba6508bd1"
+  },
+  "mesh-comparison.json": {
+    "source_at_export": "tmp/rf-repro/results/convergence-diagnostics/paper-stable/comparison.json",
+    "sha256": "dbcd92743d1e230d72aec0a4f4343ae19d7e6ba047a0eb43334a3706bf6df475"
+  },
+  "convergence-audit.json": {
+    "source_at_export": "tmp/rf-repro/results/convergence-diagnostics/audit.json",
+    "sha256": "ac53d754e749972228774ba49799714cf5855f5ddfbbca889d595e5e90616532"
+  },
+  "comsol-digitized.csv": {
+    "source_at_export": "tmp/comsol-response-review/comsol-digitized.csv",
+    "sha256": "ed86e65ac9ddc127b415d01abb903727bc6364b19e14e075606f566f8778be81"
+  },
+  "comsol-metrics.json": {
+    "source_at_export": "tmp/comsol-response-review/metrics.json",
+    "sha256": "7297734cef74e22f8c91223d11236f624c7bfe532197c5a12992dc92e46f48d1"
+  },
+  "material-experiment.json": {
+    "source_at_export": "tmp/material-comparison/experiment.json",
+    "sha256": "641ed9c293b247506e1d920666fc535f9b361a25b23710bcd37e26217db7cffa"
+  },
+  "material-audit.json": {
+    "source_at_export": "tmp/material-comparison/material-audit.json",
+    "sha256": "5bdc58a67e1f0c1bbc2509a9dca820b612b90c56107dd65a091a1994dd990931"
+  },
+  "material-extraction-verification.json": {
+    "source_at_export": "tmp/material-comparison/extraction-verification.json",
+    "sha256": "15df9f8b38c23ac46faf7249568fdf2238f9588a980753fe45cdf8dee8a86c0c"
+  },
+  "material-paper-selection.json": {
+    "source_at_export": "tmp/material-comparison/paper-selection.json",
+    "sha256": "18098110ffe0cc934bd78e24a5e57a7d43de57edb6532b8faeb5e1c2bc5d1e8a"
+  },
+  "material-refinement.json": {
+    "source_at_export": "tmp/material-comparison/refinement.json",
+    "sha256": "f6e20256073b60ae16e6b4b0a7161ba5cee1696b17941b06725fdf0c9bb03b7c"
+  },
+  "material-summary.csv": {
+    "source_at_export": "tmp/material-comparison/summary.csv",
+    "sha256": "901f5e14429f63f254bced9d5899ae40e4db3710a92db2fa41abadf579433df8"
+  },
+  "report-metrics.json": {
+    "source_at_export": "tmp/final-report/report-metrics.json",
+    "sha256": "3365f6599dff29dfab2c38a4f5a169cb71f7f8665b76d625e36d01603934d713"
+  },
+  "adopted-network.s2p": {
+    "source_at_export": "tmp/rf-repro/results/paper-refine-9-01/network.s2p",
+    "sha256": "8b1345048de34da0066aca89b1203ed3ec8dbd338466cffe474cd4363b2a06ef"
+  },
+  "feed-comparison.json": {
+    "source_at_export": "tmp/feed-transition-study/comparison.json",
+    "sha256": "d28e10b6b867fc5ad84a1e3edf5408ab6643711b28b0e1de9a1ee54987a06fac"
+  },
+  "feed-final-checks.json": {
+    "source_at_export": "tmp/feed-transition-study/final-checks.json",
+    "sha256": "8a1145911fcc26a534c779e65dcfd2a8f8a3c357298d70d70ae24dd30349ac91"
+  },
+  "feed-controlled-variables.json": {
+    "source_at_export": "tmp/feed-transition-study/controlled-variables.json",
+    "sha256": "429a9fe47754a2eadaaedd59a45c8d8dd10505754893686fc4f0aad5e28628de"
+  },
+  "no-shorts-status.json": {
+    "source_at_export": "tmp/feed-transition-study/no-shorts/status.json",
+    "sha256": "cdb6f67e459d2cf625d14b8f1b832c7edabf692ba2da651d274e98b50b504c06"
+  },
+  "target-score-verification.json": {
+    "source_at_export": "tmp/score-rmse-default/verification.json",
+    "sha256": "b38006c83b6f76c86b6561891e38ea7be18b9308f7c166f225762bfb021deb0e"
+  },
+  "material-s21-curves.csv": {
+    "method": "frequency_Hz and 20*log10(max(abs(S21), 1e-15)) from the four completed runs",
+    "sha256": "25d1ea25e51ea1723c0497a04fb7051b2c803ee919acbacf6ca97f91ed24c2c0",
+    "inputs": {
+      "baseline_r4": {
+        "source_at_export": "tmp/material-comparison/runs/baseline_r4/sparameters.csv",
+        "sha256": "b4626c69214144f63c451d7ba870e8f2cbc55b0d5a46a51e29ea243ad73778e7"
+      },
+      "epsilon_4p4_r4": {
+        "source_at_export": "tmp/material-comparison/runs/epsilon_4p4_r4/sparameters.csv",
+        "sha256": "bc86ea9b84ec108877b32c1da4fe88865ade54672692cbd888bd92f35cac6737"
+      },
+      "fr4_like_r4": {
+        "source_at_export": "tmp/material-comparison/runs/fr4_like_r4/sparameters.csv",
+        "sha256": "04e82502a1cdb86a8320bc18ce25b8b43b3c74112f54600cd958a3e6bcb122f0"
+      },
+      "thickness_0p125_r4": {
+        "source_at_export": "tmp/material-comparison/runs/thickness_0p125_r4/sparameters.csv",
+        "sha256": "6716965d41f0fc61c6625755f04bd02dc019e02b80797d954a97860243b7527c"
+      }
+    }
+  },
+  "scientific_core_sha256": {
+    "model.py": "a1b8371307cb7768bd1efad31d0eeaf04d0ba8551086875b101848b73950255e",
+    "geometry.py": "de29f350a055043a785bf465d7f08adb134aa6f8fb2c47d217b34e021e41f5bf",
+    "postprocess.py": "74292623abfd3258f88ed4057646d82e5077f7f20841d338bb3909b37d4b9081"
+  }
+}
