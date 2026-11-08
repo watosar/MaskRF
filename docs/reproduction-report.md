@@ -53,7 +53,7 @@
 | 格子 | 画素9分割、基板16分割、最大間隔0.075 mm、給電端局所間隔約0.004167 mm | 完成格子の給電端配置を検査。電流計測点は計測面から前後±0.025 mm |
 | 周波数・時間条件 | 10–30 GHzの401点、終了エネルギー比10⁻⁷、最大400,000ステップ | 2励振を独立に解析。各励振のタイムアウト7,200秒、標準4スレッド |
 
-設定は[同梱YAML](../src/rf_repro/configs/paper_corrected.yaml)と[編集用設定例](../examples/configs/paper_corrected.yaml)で管理する。無損失という語は材料の吸収損失をゼロとする意味であり、反射・放射による透過低下は生じる。
+設定は[同梱YAML](../src/maskrf/configs/paper_corrected.yaml)と[編集用設定例](../examples/configs/paper_corrected.yaml)で管理する。無損失という語は材料の吸収損失をゼロとする意味であり、反射・放射による透過低下は生じる。
 
 ターゲット採点の標準指標は、線形振幅 `|S21|` のRMSEとする。原論文の平均L1による評価とは指標を区別し、大きな局所誤差を相対的に強く反映する候補比較に用いる。
 
@@ -244,7 +244,7 @@ wheelの独立環境への導入とソースディレクトリ外での利用も
 
 | 内容 | 保存先 |
 |---|---|
-| 現在の実装と利用仕様 | [src/rf_repro](../src/rf_repro/)、[利用方法](usage.md)、[tests](../tests/) |
+| 現在の実装と利用仕様 | [src/maskrf](../src/maskrf/)、[利用方法](usage.md)、[tests](../tests/) |
 | 条件の出典・仮定 | [conditions.md](data/conditions.md)、[抽出条件](data/paper-extraction.json) |
 | 採用モデルの全S・実効設定・終了判定 | [CSV](../tests/fixtures/completed-run/sparameters.csv)、[Touchstone](data/adopted-network.s2p)、[実効設定](../tests/fixtures/completed-run/effective.json)、[終了判定](../tests/fixtures/completed-run/status.json) |
 | 定量比較と掲載図の入力 | [指標JSON](data/report-metrics.json)、[図生成](../examples/plot_report.py) |

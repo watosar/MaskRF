@@ -1,6 +1,6 @@
-# Dall-EM マスク回路シミュレータ
+# MaskRF：金属マスクのRF応答解析
 
-16×16の二値金属マスクから、openEMSで2ポート回路の複素Sパラメータを計算するPythonライブラリです。配布名は `dall-em`、import名は `rf_repro`、CLIは `rf-repro` です。
+16×16の二値金属マスクから、openEMSで2ポート回路の複素Sパラメータを計算するPythonライブラリです。配布名・import名・CLIはいずれも `maskrf` です。
 
 目的は、Guoらの論文 *Dall-EM*（IMS 2025）図3(a)の回路を独立した電磁界ソルバで評価し、マスクの周波数応答を再計算できる基盤を作ることです。公開資料で確定できない条件は仮定として扱い、計算の数値的な安定性と原論文との一致を別々に評価します。
 
@@ -39,7 +39,7 @@ Python 3.12と `uv` を使い、リポジトリのルートで実行します。
 ```bash
 uv sync --locked --inexact
 source env.sh
-uv run rf-repro evaluate --mask examples/data/fig3a-mask.csv --out tmp/example-response --reuse-run tests/fixtures/completed-run
+uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/example-response --reuse-run tests/fixtures/completed-run
 uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --target examples/data/lowpass-target.csv --out tmp/example-score --reuse-run tests/fixtures/completed-run
 ```
 
@@ -51,7 +51,7 @@ uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --targe
 
 | 場所 | 内容 |
 |---|---|
-| [src/rf_repro](src/rf_repro/) | ライブラリ、API、CLI、同梱標準設定とマスク |
+| [src/maskrf](src/maskrf/) | ライブラリ、API、CLI、同梱標準設定とマスク |
 | [examples](examples/) | 利用側のスクリプト、編集用設定、マスクとターゲット例 |
 | [tests](tests/) | 保守するテストと保存済み応答のfixture |
 | [scripts](scripts/) | ネイティブ環境の構築 |

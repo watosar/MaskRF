@@ -1,6 +1,6 @@
 # 導入と利用方法
 
-このライブラリは、設定で定めた基板・給電・短絡に16×16の金属マスクを配置し、2ポート回路を評価する。目的と検証結果は[検証レポート](reproduction-report.md)を参照する。以下のコマンドはリポジトリのルートで実行し、Pythonの実行・環境管理には `uv` を使う。
+MaskRFは、設定で定めた基板・給電・短絡に16×16の金属マスクを配置し、2ポート回路を評価する。目的と検証結果は[検証レポート](reproduction-report.md)を参照する。以下のコマンドはリポジトリのルートで実行し、Pythonの実行・環境管理には `uv` を使う。
 
 ## 1. Python環境
 
@@ -9,7 +9,7 @@ Python 3.12を使用する。パッケージは `src/` レイアウトで、標�
 ```bash
 uv sync --locked --inexact
 source env.sh
-uv run rf-repro --help
+uv run maskrf --help
 ```
 
 この環境だけで、入力検査、保存済み応答の読み込み・再利用、ターゲット採点を実行できる。新規FDTD解析、形状・メッシュの生成、保存波形の再処理には次のネイティブ環境が必要になる。
@@ -26,7 +26,7 @@ source env.sh
 
 [bootstrap.sh](../scripts/bootstrap.sh)はopenEMS-Project v0.0.36の固定コミットとサブモジュールをビルドする。依存するUbuntuパッケージはダウンロード・展開し、システムへはインストールしない。構築用ファイルは `tmp/native-build/`、導入先とwheelは `.native/`、Python環境は `.venv/` に保存する。他のOS・CPU向けの構築手順は検証していない。
 
-`env.sh` は共有ライブラリの参照先と、Matplotlibの作業先を設定する。外部のネイティブ導入先を使う場合は、sourceする前に `RF_REPRO_NATIVE` をそのパスへ設定する。
+`env.sh` は共有ライブラリの参照先と、Matplotlibの作業先を設定する。外部のネイティブ導入先を使う場合は、sourceする前に `MASKRF_NATIVE` をそのパスへ設定する。
 
 環境の同期には `uv sync --locked --inexact` を使う。ネイティブバインディングはローカルwheelから追加するため、通常の同期で削除しないようにする。`.venv` を作り直した場合は、保存済みwheelを再導入する。
 
@@ -51,7 +51,7 @@ source env.sh
 
 CSVはヘッダなしの16行×16列、JSONは二次元配列そのものを入力する。18×18の端子込み表現の自動変換や、孤立金属の除去、角接触の接続・切断などの形状修正は行わない。
 
-標準設定は[同梱YAML](../src/rf_repro/configs/paper_corrected.yaml)にある。条件を変更する場合は[編集用設定例](../examples/configs/paper_corrected.yaml)をコピーし、APIの `config_path` またはCLIの `--config` に渡す。マスク評価には `geometry.kind: mask` と `solver.excitations: [1, 2]` が必要である。設定の長さはmm、周波数は `frequency_GHz: [開始, 終了, 点数]` で指定する。低位の `run`・`inspect` コマンドでは、`geometry.file` をYAMLの所在からの相対パスとして解決する。`evaluate_mask` はその値を入力マスクの保存先へ置き換える。
+標準設定は[同梱YAML](../src/maskrf/configs/paper_corrected.yaml)にある。条件を変更する場合は[編集用設定例](../examples/configs/paper_corrected.yaml)をコピーし、APIの `config_path` またはCLIの `--config` に渡す。マスク評価には `geometry.kind: mask` と `solver.excitations: [1, 2]` が必要である。設定の長さはmm、周波数は `frequency_GHz: [開始, 終了, 点数]` で指定する。低位の `run`・`inspect` コマンドでは、`geometry.file` をYAMLの所在からの相対パスとして解決する。`evaluate_mask` はその値を入力マスクの保存先へ置き換える。
 
 材料・形状・格子の変更には個別の精度確認が必要である。図3(a)について確認した格子差を、変更後の設定や任意マスクの誤差上限として使わない。
 
@@ -60,7 +60,7 @@ CSVはヘッダなしの16行×16列、JSONは二次元配列そのものを入�
 公開APIは `evaluate_mask`、`load_response`、戻り値の `CircuitResponse`、解析失敗を表す `SimulationError` である。
 
 ```python
-from rf_repro import evaluate_mask, load_response
+from maskrf import evaluate_mask, load_response
 
 response = evaluate_mask(
     "examples/data/fig3a-mask.csv",
@@ -92,8 +92,8 @@ saved = load_response("tmp/python-example")
 
 ```bash
 source env.sh
-uv run rf-repro evaluate --mask examples/data/fig3a-mask.csv --out tmp/circuit-01
-uv run rf-repro inspect --config examples/configs/paper_corrected.yaml --out tmp/inspect-01
+uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/circuit-01
+uv run maskrf inspect --config examples/configs/paper_corrected.yaml --out tmp/inspect-01
 ```
 
 `evaluate` は成功時に応答JSONを標準出力と `response.json` に返す。失敗時は非ゼロ終了となり、エラーJSONを標準エラーに出す。解析開始後の失敗は `error.json` にも残す。入力やソルバのログは出力先へ保存する。
@@ -107,17 +107,17 @@ uv run rf-repro inspect --config examples/configs/paper_corrected.yaml --out tmp
 | `run/sparameters.csv`・`run/network.s2p` | 全複素SのCSVとTouchstone |
 | `run/solver-*.log`・`run/excite-*/` | 励振ごとのログと波形 |
 
-`--reuse-run` を指定した場合は `run/` を新規作成せず、応答は既存解析を参照する。CLIは `uv run python -m rf_repro` からも呼び出せる。
+`--reuse-run` を指定した場合は `run/` を新規作成せず、応答は既存解析を参照する。CLIは `uv run python -m maskrf` からも呼び出せる。
 
 低位の解析操作は次のとおりである。`compare` と `postprocess` は保存波形を再処理するため、ネイティブ環境も必要になる。`convergence` は設定の `convergence` に列挙した各格子で新規解析し、設定した段階間の差を計算する。
 
 `run` と `convergence` は、各励振の正常終了と減衰を確認する。終了コード0でも減衰条件未達なら状態とログを保存して非ゼロ終了し、後続の励振・格子解析と通常の後処理へは進まない。`postprocess` は設定した全励振の波形が保存されている場合に診断用の再処理として使えるが、その処理の成功は解析の正常終了・減衰を意味しない。第1励振で停止して第2励振の波形がないrunは、そのまま全Sを再処理できない。
 
 ```bash
-uv run rf-repro run --config examples/configs/paper_corrected.yaml --out tmp/raw-run-01
-uv run rf-repro postprocess --run tmp/raw-run-01
-uv run rf-repro compare --runs tmp/raw-run-01 tmp/raw-run-02 --out tmp/comparison-01
-uv run rf-repro convergence --config examples/configs/paper_corrected.yaml --out tmp/convergence-01
+uv run maskrf run --config examples/configs/paper_corrected.yaml --out tmp/raw-run-01
+uv run maskrf postprocess --run tmp/raw-run-01
+uv run maskrf compare --runs tmp/raw-run-01 tmp/raw-run-02 --out tmp/comparison-01
+uv run maskrf convergence --config examples/configs/paper_corrected.yaml --out tmp/convergence-01
 ```
 
 比較する解析は同じ周波数配列を必要とする。`raw-run-02` は比較対象の設定で別途実行した解析を指定する。各runに両励振の波形が保存されている場合、`compare` は未完了・未減衰の応答も診断用に比較できるが、比較処理の終了コードだけで格子検証を合格とは判断しない。
@@ -171,7 +171,11 @@ RMSEは候補比較の指標であり、帯域仕様の合否判定は実装し�
 ## 7. 開発時の確認
 
 ```bash
+uv sync --locked --inexact
 source env.sh
+uv run ruff check .
+uv run ruff format --check .
+uv run pyright
 uv run python -m unittest discover -s tests -v
 uv run python tests/check_geometry.py
 uv run python tests/check_network_extraction.py
