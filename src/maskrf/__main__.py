@@ -291,7 +291,6 @@ def main():
     parser.add_argument("--excitation", type=int)
     parser.add_argument("--runs", nargs="+")
     parser.add_argument("--mask")
-    parser.add_argument("--reuse-run")
     a = parser.parse_args()
     if a.command == "evaluate":
         if not a.mask or not a.out:
@@ -299,9 +298,7 @@ def main():
         from .api import evaluate_mask
 
         try:
-            result = evaluate_mask(
-                a.mask, a.out, config_path=a.config, reuse_run=a.reuse_run
-            )
+            result = evaluate_mask(a.mask, a.out, config_path=a.config)
             print(json.dumps(result.to_dict(), allow_nan=False))
         except (
             ValueError,

@@ -1,6 +1,8 @@
 """Check target units, amplitude scoring, and the public-API consumer CLI."""
 
+import contextlib
 import importlib.util
+import io
 import json
 import subprocess
 import tempfile
@@ -9,6 +11,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
+from solver_stub import complete_solver
+
+from maskrf import load_response
 
 PROJECT = Path(__file__).resolve().parents[1]
 SCRIPT = PROJECT / "examples/score_mask.py"
@@ -109,11 +114,62 @@ class ScoreMaskTests(unittest.TestCase):
                 )
             evaluate.assert_not_called()
 
-    def test_cli_uses_completed_response_and_prints_only_float(self):
+    def test_cli_runs_simulator_and_prints_only_float(self):
         with tempfile.TemporaryDirectory(prefix="maskrf-score-mask-") as directory:
             out = Path(directory) / "result"
             target = Path(directory) / "target.csv"
             target.write_text("frequency_GHz,s21_magnitude\n10.5,1\n12,0\n")
+            output = io.StringIO()
+            with (
+                patch("maskrf.api.subprocess.run", side_effect=complete_solver),
+                contextlib.redirect_stdout(output),
+            ):
+                returncode = example.main(
+                    [
+                        "--mask",
+                        str(PROJECT / "examples/data/fig3a-mask.csv"),
+                        "--target",
+                        str(target),
+                        "--out",
+                        str(out),
+                    ]
+                )
+            self.assertEqual(returncode, 0)
+            value = float(output.getvalue())
+            self.assertEqual(output.getvalue(), f"{value}\n")
+            # 60-digit Decimal reference from the fixture's real/imaginary components.
+            # |S21| at 10.5 and 12 GHz is .6364795251 and .8240304457.
+            self.assertAlmostEqual(value, 0.6368568563857028)
+            record = json.loads((out / "score.json").read_text())
+            self.assertEqual(record["metric"], "s21_magnitude_rmse")
+            self.assertEqual(record["sample_count"], 2)
+            self.assertEqual(record["value"], value)
+            self.assertEqual((out / "target.csv").read_bytes(), target.read_bytes())
+            self.assertEqual(
+                json.loads((out / "response.json").read_text())["execution"],
+                "simulated",
+            )
+            with patch("maskrf.api.subprocess.run", side_effect=complete_solver):
+                direct = example.score_mask(
+                    PROJECT / "examples/data/fig3a-mask.csv",
+                    target,
+                    Path(directory) / "python-default",
+                )
+            self.assertIs(type(direct), float)
+            self.assertEqual(direct, value)
+
+    def test_saved_response_can_be_scored_without_simulating(self):
+        response = load_response(PROJECT / "tests/fixtures/completed-run")
+        value = example.s21_error(
+            response.frequency_Hz, response.s[:, 1, 0], [10.5e9, 12e9], [1, 0]
+        )
+        self.assertAlmostEqual(value, 0.6368568563857028)
+
+    def test_cli_rejects_invalid_target_from_other_directory(self):
+        with tempfile.TemporaryDirectory(prefix="maskrf-score-mask-") as directory:
+            target = Path(directory) / "invalid.csv"
+            target.write_text("frequency_GHz,s21_magnitude\n10,nan\n")
+            out = Path(directory) / "result"
             result = subprocess.run(
                 [
                     "uv",
@@ -126,35 +182,43 @@ class ScoreMaskTests(unittest.TestCase):
                     str(target),
                     "--out",
                     str(out),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+                cwd=directory,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.stdout, "")
+            self.assertIn("Target values must be finite", result.stderr)
+            self.assertFalse(out.exists())
+
+    def test_removed_reuse_option_is_rejected_before_creating_output(self):
+        with tempfile.TemporaryDirectory(prefix="maskrf-score-mask-") as directory:
+            out = Path(directory) / "removed-option"
+            result = subprocess.run(
+                [
+                    "uv",
+                    "run",
+                    "python",
+                    str(SCRIPT),
+                    "--mask",
+                    str(PROJECT / "examples/data/fig3a-mask.csv"),
+                    "--target",
+                    str(PROJECT / "examples/data/lowpass-target.csv"),
+                    "--out",
+                    str(out),
                     "--reuse-run",
                     str(PROJECT / "tests/fixtures/completed-run"),
                 ],
                 capture_output=True,
                 text=True,
-                check=True,
+                check=False,
                 cwd=directory,
             )
-            value = float(result.stdout)
-            self.assertEqual(result.stdout, f"{value}\n")
-            # 60-digit Decimal reference from the fixture's real/imaginary components.
-            # |S21| at 10.5 and 12 GHz is .6364795251 and .8240304457.
-            self.assertAlmostEqual(value, 0.6368568563857028)
-            record = json.loads((out / "score.json").read_text())
-            self.assertEqual(record["metric"], "s21_magnitude_rmse")
-            self.assertEqual(record["sample_count"], 2)
-            self.assertEqual(record["value"], value)
-            self.assertEqual((out / "target.csv").read_bytes(), target.read_bytes())
-            self.assertEqual(
-                json.loads((out / "response.json").read_text())["execution"], "reused"
-            )
-            direct = example.score_mask(
-                PROJECT / "examples/data/fig3a-mask.csv",
-                target,
-                Path(directory) / "python-default",
-                reuse_run=PROJECT / "tests/fixtures/completed-run",
-            )
-            self.assertIs(type(direct), float)
-            self.assertEqual(direct, value)
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(result.stdout, "")
+            self.assertFalse(out.exists())
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 """Contract and failure-path tests; native smoke simulation is run separately."""
 
+import contextlib
+import io
 import json
 import subprocess
 import sys
@@ -11,7 +13,9 @@ from unittest.mock import patch
 import numpy as np
 import yaml
 from PIL import Image
+from solver_stub import complete_solver
 
+import maskrf.__main__ as cli
 from maskrf import SimulationError, evaluate_mask, load_response
 from maskrf.api import DEFAULT_CONFIG, read_mask
 
@@ -62,9 +66,9 @@ class InterfaceTests(unittest.TestCase):
             with self.subTest(value=str(type(value))), self.assertRaises(ValueError):
                 read_mask(value)
 
-    def test_native_ordering_and_reuse(self):
-        response = evaluate_mask(MASK, self.directory / "reused", reuse_run=RUN)
-        self.assertEqual(response.execution, "reused")
+    def test_saved_response_preserves_component_order(self):
+        response = load_response(RUN)
+        self.assertEqual(response.execution, "loaded")
         self.assertEqual(response.s.shape, (401, 2, 2))
         csv = np.genfromtxt(RUN / "sparameters.csv", names=True, delimiter=",")
         for i in range(2):
@@ -73,10 +77,22 @@ class InterfaceTests(unittest.TestCase):
                 np.testing.assert_array_equal(
                     response.s[:, i, j], csv[key + "_real"] + 1j * csv[key + "_imag"]
                 )
-        np.testing.assert_array_equal(
-            load_response(self.directory / "reused").s, response.s
+        self.assertAlmostEqual(
+            response.metrics["max_coherent_power_ratio"], 1.004539833147887
         )
-        doc = json.loads((self.directory / "reused/response.json").read_text())
+
+    def test_evaluate_runs_solver_and_saves_response(self):
+        out = self.directory / "simulated"
+        with patch("maskrf.api.subprocess.run", side_effect=complete_solver):
+            response = evaluate_mask(MASK, out)
+        self.assertEqual(response.execution, "simulated")
+        self.assertEqual(response.run_dir, out / "run")
+        np.testing.assert_array_equal(response.s, load_response(RUN).s)
+        np.testing.assert_array_equal(load_response(out).s, response.s)
+        np.testing.assert_array_equal(read_mask(out / "mask.csv"), MASK)
+        self.assertTrue((out / "execution.log").is_file())
+        doc = json.loads((out / "response.json").read_text())
+        self.assertEqual(doc["execution"], "simulated")
         self.assertFalse(doc["validation"]["mesh_convergence_checked_by_this_call"])
         self.assertEqual(
             doc["settings"]["geometry"]["shorts"],
@@ -86,22 +102,23 @@ class InterfaceTests(unittest.TestCase):
             doc["metrics"]["max_coherent_power_ratio"], 1.004539833147887
         )
         with self.assertRaises(FileExistsError):
-            evaluate_mask(MASK, self.directory / "reused", reuse_run=RUN)
+            evaluate_mask(MASK, out)
 
-    def test_reuse_rejects_changed_input_or_conditions(self):
+    def test_evaluate_passes_changed_mask_and_conditions_to_solver(self):
         changed = MASK.copy()
         changed[8, 8] = 1 - changed[8, 8]
-        with self.assertRaises(ValueError):
-            evaluate_mask(changed, self.directory / "wrong-mask", reuse_run=RUN)
         c = yaml.safe_load(DEFAULT_CONFIG.read_text())
         c["substrate"]["epsilon_r"] = 4
         path = self.directory / "changed.yaml"
         path.write_text(yaml.safe_dump(c))
-        with self.assertRaises(ValueError):
-            evaluate_mask(
-                MASK, self.directory / "wrong-config", config_path=path, reuse_run=RUN
-            )
-        self.assertFalse((self.directory / "wrong-mask").exists())
+        out = self.directory / "custom"
+        with patch("maskrf.api.subprocess.run", side_effect=complete_solver):
+            response = evaluate_mask(changed, out, config_path=path)
+        np.testing.assert_array_equal(response.mask, changed)
+        self.assertEqual(response.settings["substrate"]["epsilon_r"], 4)
+        self.assertEqual(
+            json.loads((out / "request.json").read_text())["config_source"], str(path)
+        )
 
     def test_incomplete_and_undecayed_results(self):
         for label, status in [
@@ -176,21 +193,22 @@ class InterfaceTests(unittest.TestCase):
 
     def test_cli_json_and_errors(self):
         command = [
-            "uv",
-            "run",
-            "python",
-            "-m",
             "maskrf",
             "evaluate",
             "--mask",
             str(RUN / "mask.csv"),
             "--out",
             str(self.directory / "cli"),
-            "--reuse-run",
-            str(RUN),
         ]
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        self.assertEqual(json.loads(result.stdout)["execution"], "reused")
+        output = io.StringIO()
+        with (
+            patch.object(sys, "argv", command),
+            patch("maskrf.api.subprocess.run", side_effect=complete_solver),
+            contextlib.redirect_stdout(output),
+        ):
+            cli.main()
+        self.assertEqual(json.loads(output.getvalue())["execution"], "simulated")
+        self.assertTrue((self.directory / "cli/response.json").is_file())
         bad = self.directory / "invalid.json"
         bad.write_text("[[2]]")
         result = subprocess.run(
@@ -213,6 +231,31 @@ class InterfaceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertEqual(result.stdout, "")
         self.assertEqual(json.loads(result.stderr)["status"], "failed")
+
+    def test_removed_reuse_option_is_rejected_before_creating_output(self):
+        out = self.directory / "removed-option"
+        result = subprocess.run(
+            [
+                "uv",
+                "run",
+                "python",
+                "-m",
+                "maskrf",
+                "evaluate",
+                "--mask",
+                str(RUN / "mask.csv"),
+                "--out",
+                str(out),
+                "--reuse-run",
+                str(RUN),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertFalse(out.exists())
 
 
 if __name__ == "__main__":

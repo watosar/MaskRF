@@ -135,13 +135,11 @@ def s21_mae(frequency_hz, s21, target_frequency_hz, target_magnitude) -> float:
     )
 
 
-def score_mask(
-    mask, target_path, out_dir, *, metric="rmse", config_path=None, reuse_run=None
-) -> float:
+def score_mask(mask, target_path, out_dir, *, metric="rmse", config_path=None) -> float:
     """Evaluate a mask, save response and score evidence, and return one float.
 
     out_dir must be unused, as required by evaluate_mask. Invalid target CSVs are
-    rejected before invoking the simulator. reuse_run is checked by the library.
+    rejected before invoking the simulator. Every call runs a new simulation.
     RMSE is the default; choose metric explicitly to use another aggregation.
     """
     _metric(metric)
@@ -150,9 +148,7 @@ def score_mask(
     target_frequency_hz, target_magnitude = parse_target_csv(
         target_bytes.decode("utf-8-sig")
     )
-    response = evaluate_mask(
-        mask, out_dir, config_path=config_path, reuse_run=reuse_run
-    )
+    response = evaluate_mask(mask, out_dir, config_path=config_path)
     value = s21_error(
         response.frequency_Hz,
         response.s[:, 1, 0],
@@ -216,11 +212,6 @@ def main(argv=None):
         type=Path,
         help="Optional simulation YAML; defaults to the adopted lossless RO setup",
     )
-    parser.add_argument(
-        "--reuse-run",
-        type=Path,
-        help="Completed run with the same mask and simulation settings",
-    )
     args = parser.parse_args(argv)
     try:
         value = score_mask(
@@ -229,7 +220,6 @@ def main(argv=None):
             args.out,
             metric=args.metric,
             config_path=args.config,
-            reuse_run=args.reuse_run,
         )
     except (OSError, ValueError, SimulationError) as error:
         parser.exit(1, f"error: {error}\n")

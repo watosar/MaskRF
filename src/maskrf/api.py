@@ -57,7 +57,7 @@ def read_mask(mask):
 
 
 def _settings(config):
-    """Conservative reuse key: all simulation/measurement settings must match."""
+    """Extract simulation and measurement settings without the mask file path."""
     result = {
         key: copy.deepcopy(config[key])
         for key in (
@@ -187,12 +187,12 @@ def load_response(run_dir):
         ) from error
 
 
-def evaluate_mask(mask, out_dir, *, config_path=None, reuse_run=None):
+def evaluate_mask(mask, out_dir, *, config_path=None):
     """Evaluate a 16x16 metal mask; preserve inputs, logs and response.json in out_dir.
 
     Defaults to the accepted Fig.3(a) substrate, feeds, shorts and finest mesh.
-    This synchronous call may take tens of minutes. Existing output paths are
-    refused. reuse_run is explicit and requires the same mask and settings.
+    This synchronous call always runs a new simulation and may take tens of
+    minutes. Existing output paths are refused.
     """
     array = read_mask(mask)
     path = Path(config_path or DEFAULT_CONFIG).resolve()
@@ -205,16 +205,6 @@ def evaluate_mask(mask, out_dir, *, config_path=None, reuse_run=None):
         raise ValueError(
             "evaluate_mask requires excitations [1, 2] for a full S matrix"
         )
-    previous = None
-    if reuse_run is not None:
-        previous = load_response(reuse_run)
-        if (
-            not np.array_equal(array, previous.mask)
-            or _settings(config) != previous.settings
-        ):
-            raise ValueError(
-                "reuse_run mask or simulation settings differ from this request"
-            )
     out_dir = Path(out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=False)
     np.savetxt(out_dir / "mask.csv", array, delimiter=",", fmt="%d")
@@ -223,41 +213,36 @@ def evaluate_mask(mask, out_dir, *, config_path=None, reuse_run=None):
     request = {
         "config_source": str(path),
         "mask_sha256": hashlib.sha256(array.tobytes()).hexdigest(),
-        "reuse_run": None if previous is None else str(previous.run_dir),
         "geometry_audit": mask_audit(config),
     }
     (out_dir / "request.json").write_text(
         json.dumps(request, indent=2, allow_nan=False)
     )
     try:
-        if previous is not None:
-            response = previous
-            response.execution = "reused"
-        else:
-            command = [
-                "uv",
-                "run",
-                "--no-project",
-                "--python",
-                sys.executable,
-                "-m",
-                "maskrf",
-                "run",
-                "--config",
-                str(out_dir / "request.yaml"),
-                "--out",
-                str(out_dir / "run"),
-            ]
-            with (out_dir / "execution.log").open("w") as log:
-                result = subprocess.run(
-                    command, stdout=log, stderr=subprocess.STDOUT, check=False
-                )
-            if result.returncode:
-                raise SimulationError(
-                    f"Simulator exited with {result.returncode}; see {out_dir}/execution.log"
-                )
-            response = load_response(out_dir / "run")
-            response.execution = "simulated"
+        command = [
+            "uv",
+            "run",
+            "--no-project",
+            "--python",
+            sys.executable,
+            "-m",
+            "maskrf",
+            "run",
+            "--config",
+            str(out_dir / "request.yaml"),
+            "--out",
+            str(out_dir / "run"),
+        ]
+        with (out_dir / "execution.log").open("w") as log:
+            result = subprocess.run(
+                command, stdout=log, stderr=subprocess.STDOUT, check=False
+            )
+        if result.returncode:
+            raise SimulationError(
+                f"Simulator exited with {result.returncode}; see {out_dir}/execution.log"
+            )
+        response = load_response(out_dir / "run")
+        response.execution = "simulated"
         (out_dir / "response.json").write_text(
             json.dumps(response.to_dict(), indent=2, allow_nan=False)
         )
