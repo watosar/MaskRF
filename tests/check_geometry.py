@@ -7,8 +7,7 @@ import numpy as np
 
 from maskrf.geometry import boxes, load_mask
 
-Path("tmp/geometry-checks").mkdir(parents=True, exist_ok=True)
-with tempfile.TemporaryDirectory(dir="tmp/geometry-checks") as tmp:
+with tempfile.TemporaryDirectory(prefix="maskrf-geometry-") as tmp:
     p = Path(tmp) / "mask.csv"
     np.savetxt(p, [[1, 0, 0], [0, 0, 1]], fmt="%d", delimiter=",")
     c = {

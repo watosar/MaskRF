@@ -3,7 +3,7 @@
 import copy
 import json
 import sys
-import time
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -13,8 +13,6 @@ from maskrf import load_response
 
 PROJECT = Path(__file__).resolve().parents[1]
 FIXTURE = PROJECT / "tests/fixtures/completed-run"
-ROOT = PROJECT / "tmp/execution-tests" / str(time.time_ns())
-ROOT.mkdir(parents=True)
 FINISHED = "Time for 400000 iterations with 5491200.00 cells : 1.00 sec\n"
 UNDECAYED = (
     "RunFDTD: Warning: Max. number of timesteps was reached before the end-criteria of -70dB was reached...\n"
@@ -41,8 +39,9 @@ class ExecutionTests(unittest.TestCase):
         cls.response = load_response(FIXTURE)
 
     def setUp(self):
-        self.directory = ROOT / self.id().split(".")[-1]
-        self.directory.mkdir()
+        directory = tempfile.TemporaryDirectory(prefix="maskrf-execution-")
+        self.addCleanup(directory.cleanup)
+        self.directory = Path(directory.name)
 
     def workers(self, outputs):
         iterator = iter(outputs)
@@ -239,5 +238,4 @@ class ExecutionTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print("Test evidence:", ROOT)
     unittest.main()

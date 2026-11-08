@@ -3,7 +3,7 @@
 import json
 import subprocess
 import sys
-import time
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -15,32 +15,39 @@ from PIL import Image
 from maskrf import SimulationError, evaluate_mask, load_response
 from maskrf.api import DEFAULT_CONFIG, read_mask
 
-ROOT = Path(__file__).resolve().parents[1] / "tmp/interface-tests" / str(time.time_ns())
-ROOT.mkdir(parents=True)
 RUN = Path(__file__).resolve().parent / "fixtures/completed-run"
 MASK = read_mask(RUN / "mask.csv")
 
 
 class InterfaceTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory(prefix="maskrf-interface-")
+        self.addCleanup(directory.cleanup)
+        self.directory = Path(directory.name)
+
     def test_formats_and_orientation(self):
         pattern = np.zeros((16, 16), dtype=int)
         pattern[0, 2] = 1
         pattern[7, 15] = 1
-        np.savetxt(ROOT / "mask.csv", pattern, delimiter=",", fmt="%d")
-        (ROOT / "mask.json").write_text(json.dumps(pattern.tolist()))
-        Image.fromarray(((1 - pattern) * 255).astype("uint8")).save(ROOT / "mask.png")
+        np.savetxt(self.directory / "mask.csv", pattern, delimiter=",", fmt="%d")
+        (self.directory / "mask.json").write_text(json.dumps(pattern.tolist()))
+        Image.fromarray(((1 - pattern) * 255).astype("uint8")).save(
+            self.directory / "mask.png"
+        )
         for value in [
             pattern,
             pattern.tolist(),
             pattern.astype(bool),
-            ROOT / "mask.csv",
-            ROOT / "mask.json",
-            ROOT / "mask.png",
+            self.directory / "mask.csv",
+            self.directory / "mask.json",
+            self.directory / "mask.png",
         ]:
             np.testing.assert_array_equal(read_mask(value), pattern)
-        Image.fromarray(np.full((16, 16), 127, dtype="uint8")).save(ROOT / "gray.png")
+        Image.fromarray(np.full((16, 16), 127, dtype="uint8")).save(
+            self.directory / "gray.png"
+        )
         with self.assertRaises(ValueError):
-            read_mask(ROOT / "gray.png")
+            read_mask(self.directory / "gray.png")
 
     def test_invalid_masks(self):
         for value in [
@@ -56,7 +63,7 @@ class InterfaceTests(unittest.TestCase):
                 read_mask(value)
 
     def test_native_ordering_and_reuse(self):
-        response = evaluate_mask(MASK, ROOT / "reused", reuse_run=RUN)
+        response = evaluate_mask(MASK, self.directory / "reused", reuse_run=RUN)
         self.assertEqual(response.execution, "reused")
         self.assertEqual(response.s.shape, (401, 2, 2))
         csv = np.genfromtxt(RUN / "sparameters.csv", names=True, delimiter=",")
@@ -66,8 +73,10 @@ class InterfaceTests(unittest.TestCase):
                 np.testing.assert_array_equal(
                     response.s[:, i, j], csv[key + "_real"] + 1j * csv[key + "_imag"]
                 )
-        np.testing.assert_array_equal(load_response(ROOT / "reused").s, response.s)
-        doc = json.loads((ROOT / "reused/response.json").read_text())
+        np.testing.assert_array_equal(
+            load_response(self.directory / "reused").s, response.s
+        )
+        doc = json.loads((self.directory / "reused/response.json").read_text())
         self.assertFalse(doc["validation"]["mesh_convergence_checked_by_this_call"])
         self.assertEqual(
             doc["settings"]["geometry"]["shorts"],
@@ -77,20 +86,22 @@ class InterfaceTests(unittest.TestCase):
             doc["metrics"]["max_coherent_power_ratio"], 1.004539833147887
         )
         with self.assertRaises(FileExistsError):
-            evaluate_mask(MASK, ROOT / "reused", reuse_run=RUN)
+            evaluate_mask(MASK, self.directory / "reused", reuse_run=RUN)
 
     def test_reuse_rejects_changed_input_or_conditions(self):
         changed = MASK.copy()
         changed[8, 8] = 1 - changed[8, 8]
         with self.assertRaises(ValueError):
-            evaluate_mask(changed, ROOT / "wrong-mask", reuse_run=RUN)
+            evaluate_mask(changed, self.directory / "wrong-mask", reuse_run=RUN)
         c = yaml.safe_load(DEFAULT_CONFIG.read_text())
         c["substrate"]["epsilon_r"] = 4
-        path = ROOT / "changed.yaml"
+        path = self.directory / "changed.yaml"
         path.write_text(yaml.safe_dump(c))
         with self.assertRaises(ValueError):
-            evaluate_mask(MASK, ROOT / "wrong-config", config_path=path, reuse_run=RUN)
-        self.assertFalse((ROOT / "wrong-mask").exists())
+            evaluate_mask(
+                MASK, self.directory / "wrong-config", config_path=path, reuse_run=RUN
+            )
+        self.assertFalse((self.directory / "wrong-mask").exists())
 
     def test_incomplete_and_undecayed_results(self):
         for label, status in [
@@ -118,7 +129,7 @@ class InterfaceTests(unittest.TestCase):
                 ],
             ),
         ]:
-            path = ROOT / label
+            path = self.directory / label
             path.mkdir()
             (path / "status.json").write_text(json.dumps(status))
             with self.assertRaises(SimulationError):
@@ -132,19 +143,20 @@ class InterfaceTests(unittest.TestCase):
             ) as child,
             self.assertRaises(SimulationError),
         ):
-            evaluate_mask(MASK, ROOT / "failed")
+            evaluate_mask(MASK, self.directory / "failed")
         self.assertEqual(
             child.call_args.args[0][:6],
             ["uv", "run", "--no-project", "--python", sys.executable, "-m"],
         )
         self.assertNotIn("cwd", child.call_args.kwargs)
-        self.assertFalse((ROOT / "failed/response.json").exists())
+        self.assertFalse((self.directory / "failed/response.json").exists())
         self.assertEqual(
-            json.loads((ROOT / "failed/error.json").read_text())["status"], "failed"
+            json.loads((self.directory / "failed/error.json").read_text())["status"],
+            "failed",
         )
 
     def test_nonfinite_results_are_rejected(self):
-        path = ROOT / "nonfinite"
+        path = self.directory / "nonfinite"
         path.mkdir()
         for filename in ["status.json", "effective.json", "mask.csv", "metrics.json"]:
             (path / filename).write_bytes((RUN / filename).read_bytes())
@@ -173,13 +185,13 @@ class InterfaceTests(unittest.TestCase):
             "--mask",
             str(RUN / "mask.csv"),
             "--out",
-            str(ROOT / "cli"),
+            str(self.directory / "cli"),
             "--reuse-run",
             str(RUN),
         ]
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         self.assertEqual(json.loads(result.stdout)["execution"], "reused")
-        bad = ROOT / "invalid.json"
+        bad = self.directory / "invalid.json"
         bad.write_text("[[2]]")
         result = subprocess.run(
             [
@@ -192,7 +204,7 @@ class InterfaceTests(unittest.TestCase):
                 "--mask",
                 str(bad),
                 "--out",
-                str(ROOT / "invalid-output"),
+                str(self.directory / "invalid-output"),
             ],
             capture_output=True,
             text=True,
@@ -204,5 +216,4 @@ class InterfaceTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print("Test evidence:", ROOT)
     unittest.main()

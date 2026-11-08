@@ -1,7 +1,7 @@
 """Recover known complex S matrices through the production postprocessor."""
 
 import json
-import time
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -10,14 +10,15 @@ import numpy as np
 
 from maskrf import postprocess
 
-PROJECT = Path(__file__).resolve().parents[1]
-ROOT = PROJECT / "tmp/postprocess-tests" / str(time.time_ns())
-ROOT.mkdir(parents=True)
-
 
 class PostprocessTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory(prefix="maskrf-postprocess-")
+        self.addCleanup(directory.cleanup)
+        self.directory = Path(directory.name)
+
     def test_production_extraction_and_saved_component_order(self):
-        out = ROOT / "known-two-port"
+        out = self.directory / "known-two-port"
         out.mkdir()
         config = {
             "geometry": {"kind": "mask", "file": "unused-by-synthetic-build.csv"},
@@ -104,5 +105,4 @@ class PostprocessTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print("Test evidence:", ROOT)
     unittest.main()

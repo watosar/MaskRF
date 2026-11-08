@@ -11,8 +11,6 @@ from unittest.mock import patch
 import numpy as np
 
 PROJECT = Path(__file__).resolve().parents[1]
-WORK = PROJECT / "tmp/score-mask-tests"
-WORK.mkdir(parents=True, exist_ok=True)
 SCRIPT = PROJECT / "examples/score_mask.py"
 spec = importlib.util.spec_from_file_location("score_mask_example", SCRIPT)
 assert spec is not None and spec.loader is not None
@@ -92,7 +90,7 @@ class ScoreMaskTests(unittest.TestCase):
                 example.parse_target_csv(text)
 
     def test_invalid_target_does_not_invoke_simulator(self):
-        with tempfile.TemporaryDirectory(dir=WORK) as directory:
+        with tempfile.TemporaryDirectory(prefix="maskrf-score-mask-") as directory:
             target = Path(directory) / "invalid.csv"
             target.write_text("frequency_GHz,s21_magnitude\n10,nan\n")
             with patch.object(example, "evaluate_mask") as evaluate:
@@ -112,7 +110,7 @@ class ScoreMaskTests(unittest.TestCase):
             evaluate.assert_not_called()
 
     def test_cli_uses_completed_response_and_prints_only_float(self):
-        with tempfile.TemporaryDirectory(dir=WORK) as directory:
+        with tempfile.TemporaryDirectory(prefix="maskrf-score-mask-") as directory:
             out = Path(directory) / "result"
             target = Path(directory) / "target.csv"
             target.write_text("frequency_GHz,s21_magnitude\n10.5,1\n12,0\n")
