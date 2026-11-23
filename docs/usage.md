@@ -17,6 +17,8 @@ CSVはヘッダなしの16行×16列、JSONは二次元配列そのものを入�
 
 標準設定は[同梱YAML](../src/maskrf/configs/paper_corrected.yaml)にある。条件を変更する場合は[編集用設定例](../examples/configs/paper_corrected.yaml)をコピーし、APIの `config_path` またはCLIの `--config` に渡す。設定の長さはmm、周波数は `frequency_GHz: [開始, 終了, 点数]` で指定する。
 
+各項目の意味、型、範囲、同梱値、格子や周波数の刻みは[解析設定YAMLリファレンス](configuration.md)を参照する。
+
 `evaluate_mask` では引数 `mask`、`maskrf evaluate` と `maskrf inspect` では `--mask` でマスクを指定できる。マスクの評価には `geometry.kind: mask` と `solver.excitations: [1, 2]` が必要である。`run`・`convergence` または `inspect --config` でYAMLからマスクを指定する場合は、`geometry.file` にCSVまたは白黒PNGのパスを書く。相対パスの起点はYAMLを置いたディレクトリである。
 
 材料・形状・格子の変更には個別の精度確認が必要である。図3(a)について確認した格子差を、変更後の設定や任意マスクの誤差上限として使わない。

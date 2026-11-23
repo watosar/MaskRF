@@ -70,6 +70,7 @@ s21 = response.s[:, 1, 0]
 | 文書 | 内容 |
 |---|---|
 | [利用方法](docs/usage.md) | マスクと設定、Python API、CLIと保存結果、RMSE採点 |
+| [解析設定YAMLリファレンス](docs/configuration.md) | 設定項目の意味、値の範囲、同梱値、格子と周波数の刻み |
 | [検証レポート](docs/reproduction-report.md) | 背景と目的、再現条件、HFSSとの応答比較、形状と材料の寄与 |
 | [検証データ](docs/data/README.md) | レポートの掲載数値と図を確認する入力データ・出典 |
 
