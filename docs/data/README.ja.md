@@ -18,7 +18,7 @@
 
 ## データの出典と配布
 
-MaskRFのライセンスは本体のソフトウェアに適用する。下記の第三者の図から読み取った資料については、再配布条件を確認できていない。読取値を載せた比較図と抽出マスクの形状図も対象となり、過去のGitコミットにある版も含む。[MaskRFのライセンス](../../LICENSE) · [IEEEの再利用案内](https://journals.ieeeauthorcenter.ieee.org/choose-a-publishing-agreement/avoid-infringement-upon-ieee-copyright/)
+MaskRFのライセンスは本体のソフトウェアに適用する。マスクはプリント基板上の導体の配置を、曲線のCSVは周波数と振幅を記録した技術データである。形状図はMaskRFの解析モデルから作図し、比較図には読取値と計算結果を描いた。原図は表の出典を参照する。[MaskRFのライセンス](../../LICENSE) · [事実やデータの著作権の扱い](https://www.bunka.go.jp/seisaku/chosakuken/seidokaisetsu/chosakukensha_fumei/) · [技術図面と実用品の著作権の扱い](https://www.copyright.gov/comp3/chap900/ch900-visual-art.pdf)
 
 | 資料 | 出典 | 保存先 |
 |---|---|---|

@@ -18,7 +18,7 @@ The published HFSS curve and the prior COMSOL curves were digitized from images.
 
 ## Data sources and redistribution
 
-The MaskRF license covers the original software. Redistribution terms for the material extracted from the following third-party figures are unverified. This also applies to figures that redraw the digitized traces or show the recovered mask, including copies in earlier Git commits. [MaskRF license](../../LICENSE) · [IEEE guidance on reuse](https://journals.ieeeauthorcenter.ieee.org/choose-a-publishing-agreement/avoid-infringement-upon-ieee-copyright/)
+The MaskRF license covers the original software. The mask records the functional conductor layout of a printed circuit board, and the reference CSVs record frequencies and magnitudes. These files contain technical data. The geometry figures were drawn from the MaskRF simulation model, and the comparison figures plot the numerical readings alongside the simulation results. The table links to the original figures. [MaskRF license](../../LICENSE) · [Copyright and factual data](https://www.bunka.go.jp/seisaku/chosakuken/seidokaisetsu/chosakukensha_fumei/) · [Copyright in technical drawings and useful articles](https://www.copyright.gov/comp3/chap900/ch900-visual-art.pdf)
 
 | Material | Source | Location |
 |---|---|---|
