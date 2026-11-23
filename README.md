@@ -4,7 +4,7 @@
 
 NumPy配列・CSV・JSON・白黒PNGを受け取り、基板・給電・短絡を含むモデルを解析します。S11・S12・S21・S22をCSV・Touchstone・JSONで保存でき、ターゲットS21とのRMSEを返す採点スクリプトも用意しています。
 
-Guoらの論文 *Dall-EM*（IMS 2025）図3(a)を基準に検証していますが、原論文の定量再現は未達で、任意マスクの精度も未確認です。採用条件と検証結果は[検証レポート](docs/reproduction-report.md)を参照してください。
+Guoらの論文 *Dall-EM*（IMS 2025）図3(a)の回路をopenEMSで解析し、論文図から読み取ったHFSSのS21振幅と比較しました。10.5–18 GHzの16点（0.5 GHz間隔）におけるS21振幅の誤差は、dB値のRMSEで0.58 dBでした。10.5 GHzではopenEMSの計算値がHFSSの読取値より0.88 dB低い値でした。[再現条件と比較結果](docs/reproduction-report.md)
 
 ## 導入
 
@@ -70,7 +70,7 @@ s21 = response.s[:, 1, 0]
 | 文書 | 内容 |
 |---|---|
 | [利用方法](docs/usage.md) | マスクと設定、Python API、CLIと保存結果、RMSE採点 |
-| [検証レポート](docs/reproduction-report.md) | 背景と目的、採用モデル、検証結果と未達事項、参考資料 |
+| [検証レポート](docs/reproduction-report.md) | 背景と目的、再現条件、HFSSとの応答比較、形状と材料の寄与 |
 | [検証データ](docs/data/README.md) | レポートの掲載数値と図を確認する入力データ・出典 |
 
 ## 開発時の確認

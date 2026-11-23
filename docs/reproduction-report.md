@@ -34,6 +34,8 @@
 
 ## 2. 図3(a)のモデル
 
+再現計算の入力は、中央の金属パターンを収録したCSVと、外周短絡・給電線・計算条件を指定するYAMLである。[マスクCSV](../examples/data/fig3a-mask.csv) · [再現用YAML](../examples/configs/paper_outer_terminals.yaml)
+
 図3(a)には、10–15 GHzを通過域、16–30 GHzを阻止域とする回路が示されている。中央の金属パターンは2 mm角の16×16セルで、画像から読み取った金属セルは132個である。論文の学習入力は18×18で、図2の端子枠と照合すると、中央の16×16とその外周に置く端子情報に対応する。公開された先行COMSOL形状画像との照合でも、中央マスクの差は0/256セルだった。[抽出条件](data/paper-extraction.json) · [格子と端子枠の照合](data/grid-measurements.json) · [先行実装との照合](data/prior-art-verification.json)
 
 | 項目 | モデルの設定 | 原図との対応 |
