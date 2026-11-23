@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
-project="$(cd "$(dirname "$0")/.." && pwd)"
-work="$project/tmp/native-build"
-mkdir -p "$work" "$project/.native"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+source "$script_dir/paths.sh"
+work="$MASKRF_BUILD_DIR"
+prefix="$MASKRF_OPENEMS_DIR"
+mkdir -p "$work" "$prefix"
 cd "$work"
-if [ ! -e native ]; then ln -s "$project/.native" native; fi
 root="$PWD"
-source "$project/env.sh"
 for component in CSXCAD openEMS; do
  cd "$root/sources/openEMS-Project/$component/python"
  uv run --no-project --python "$root/.venv/bin/python" setup.py build_ext \
- -I"$project/.native/include:$project/.native/usr/include:$project/.native/usr/include/hdf5/serial" \
- -L"$project/.native/lib:$project/.native/usr/lib/x86_64-linux-gnu" -R"$project/.native/lib" bdist_wheel
- mkdir -p "$project/.native/wheels"
- cp dist/*.whl "$project/.native/wheels/"
+ -I"$prefix/include:$prefix/usr/include:$prefix/usr/include/hdf5/serial" \
+ -L"$prefix/lib:$prefix/usr/lib/x86_64-linux-gnu" -R"$prefix/lib" bdist_wheel
+ mkdir -p "$prefix/wheels"
+ cp dist/*.whl "$prefix/wheels/"
  uv pip install --python "$root/.venv/bin/python" dist/*.whl
  done
 
-uv sync --project "$project" --locked --inexact
-uv pip install --python "$project/.venv/bin/python" "$project"/.native/wheels/*.whl
+uv pip install --python "$MASKRF_PYTHON" --reinstall "$prefix"/wheels/*.whl

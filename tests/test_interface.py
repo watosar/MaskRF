@@ -3,6 +3,7 @@
 import contextlib
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -28,6 +29,9 @@ class InterfaceTests(unittest.TestCase):
         directory = tempfile.TemporaryDirectory(prefix="maskrf-interface-")
         self.addCleanup(directory.cleanup)
         self.directory = Path(directory.name)
+        ready = patch("maskrf.api.prepare_solver", return_value=dict(os.environ))
+        ready.start()
+        self.addCleanup(ready.stop)
 
     def test_formats_and_orientation(self):
         pattern = np.zeros((16, 16), dtype=int)

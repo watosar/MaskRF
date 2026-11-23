@@ -12,5 +12,5 @@ wheels/
 # Temporary work files, run outputs, and local records
 /tmp/
 
-# Installed native runtime
+# Legacy project-local runtime
 /.native/

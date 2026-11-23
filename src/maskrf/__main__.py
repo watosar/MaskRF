@@ -7,26 +7,37 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
 import numpy as np
 import yaml
 
-from .api import _completed_excitations
-from .geometry import boxes, load_mask, mask_audit
+from .api import DEFAULT_CONFIG, _completed_excitations, read_mask
+from .geometry import boxes, load_mask, mask_audit, terminal_boxes
 from .model import build
-from .postprocess import db, process
+from .runtime import configure_environment, prepare_solver
+
+
+def process(out):
+    from .postprocess import process as extract
+
+    return extract(out)
 
 
 def dump(path, value):
     Path(path).write_text(json.dumps(value, indent=2))
 
 
-def config(path):
+def config(path, *, mask_file=None):
     path = Path(path).resolve()
     c = yaml.safe_load(path.read_text())
-    if c["geometry"]["kind"] == "mask":
+    if mask_file is not None:
+        if c["geometry"]["kind"] != "mask":
+            raise ValueError("--mask requires a mask geometry configuration")
+        c["geometry"]["file"] = str(Path(mask_file).resolve())
+    elif c["geometry"]["kind"] == "mask":
         c["geometry"]["file"] = str((path.parent / c["geometry"]["file"]).resolve())
     if c["boundary"][4] != "PEC":
         raise ValueError("This implementation requires the z=0 PEC ground plane")
@@ -57,6 +68,7 @@ def inspect(c, out):
         load_mask(g["file"]).shape[1] * g["pitch_mm"] / 2 if g["kind"] == "mask" else 0
     )
     length = half + p["feed_length_mm"]
+    neck_length = p.get("neck", {}).get("length_mm", 0)
     ymin, ymax = c["domain"]["y_mm"]
     ax[0].add_patch(
         Rectangle(
@@ -67,7 +79,7 @@ def inspect(c, out):
             label="substrate / ground beneath",
         )
     )
-    for start, stop in boxes(c):
+    for start, stop in [*boxes(c), *terminal_boxes(c, half)]:
         ax[0].add_patch(
             Rectangle(
                 start[:2], stop[0] - start[0], stop[1] - start[1], color="#555555"
@@ -75,11 +87,11 @@ def inspect(c, out):
         )
     for i, sign in enumerate([-1, 1]):
         y = p["y_mm"][i]
-        begin = -length if sign == -1 else half
+        begin = -length if sign == -1 else half + neck_length
         ax[0].add_patch(
             Rectangle(
                 (begin, y - p["width_mm"] / 2),
-                p["feed_length_mm"],
+                p["feed_length_mm"] - neck_length,
                 p["width_mm"],
                 color="#555555",
             )
@@ -88,7 +100,17 @@ def inspect(c, out):
         ax[0].plot([plane, plane], [y - 0.4, y + 0.4], color="red")
         ax[0].text(plane, y + 0.5, f"P{i + 1} reference", fontsize=8)
     for via in g.get("shorts", []):
-        ax[0].plot(*via["xy_mm"], "bs", ms=4)
+        x, y = via["xy_mm"]
+        width = via["width_mm"]
+        ax[0].add_patch(
+            Rectangle(
+                (x - width / 2, y - width / 2),
+                width,
+                width,
+                facecolor="blue",
+                linewidth=0,
+            )
+        )
     ax[0].set_xlim(-length, length)
     ax[0].set_ylim(ymin, ymax)
     ax[0].set_aspect("equal")
@@ -192,6 +214,8 @@ def run(c, out, source=None):
 
 
 def compare_runs(paths, out):
+    from .postprocess import db
+
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     import matplotlib.pyplot as plt
@@ -285,13 +309,18 @@ def main():
             "evaluate",
         ],
     )
-    parser.add_argument("--config")
+    parser.add_argument(
+        "--config", help="Analysis YAML (optional with --mask for evaluate or inspect)"
+    )
     parser.add_argument("--out")
     parser.add_argument("--run")
     parser.add_argument("--excitation", type=int)
     parser.add_argument("--runs", nargs="+")
-    parser.add_argument("--mask")
+    parser.add_argument(
+        "--mask", help="16x16 mask file (CSV, JSON, or PNG) for evaluate or inspect"
+    )
     a = parser.parse_args()
+    configure_environment()
     if a.command == "evaluate":
         if not a.mask or not a.out:
             parser.error("evaluate requires --mask and --out")
@@ -313,6 +342,64 @@ def main():
             )
             raise SystemExit(1)
         return
+    if a.command == "inspect" and not (a.config or a.mask):
+        parser.error("inspect requires --mask or --config")
+    required = {
+        "inspect": (),
+        "run": ("config", "out"),
+        "convergence": ("config", "out"),
+        "postprocess": ("run",),
+        "compare": ("runs", "out"),
+        "worker": ("run", "excitation"),
+    }
+    for option in required[a.command]:
+        if getattr(a, option) is None:
+            parser.error(f"{a.command} requires --{option}")
+    mask = None
+    c = None
+    if a.command == "inspect":
+        try:
+            if a.mask is not None:
+                mask = read_mask(a.mask)
+            c = config(
+                a.config or DEFAULT_CONFIG,
+                mask_file=a.mask,
+            )
+        except (ValueError, OSError, KeyError, TypeError, yaml.YAMLError) as error:
+            parser.exit(1, f"maskrf: {error}\n")
+    elif a.command in ("run", "convergence"):
+        c = config(a.config)
+    if a.command in ("run", "convergence") and Path(a.out).exists():
+        raise FileExistsError(a.out)
+    directories = (
+        [a.run]
+        if a.command in ("postprocess", "worker")
+        else a.runs
+        if a.command == "compare"
+        else []
+    )
+    for directory in directories:
+        if not (Path(directory) / "effective.json").is_file():
+            parser.error(f"Missing effective.json in {directory}")
+    try:
+        environment = prepare_solver()
+        if environment.get("LD_LIBRARY_PATH") != os.environ.get("LD_LIBRARY_PATH"):
+            os.execvpe(
+                "uv",
+                [
+                    "uv",
+                    "run",
+                    "--no-project",
+                    "--python",
+                    sys.executable,
+                    "-m",
+                    "maskrf",
+                    *sys.argv[1:],
+                ],
+                environment,
+            )
+    except (RuntimeError, OSError) as error:
+        parser.exit(1, f"maskrf: {error}\n")
     if a.command == "worker":
         out = Path(a.run)
         c = json.loads((out / "effective.json").read_text())
@@ -330,9 +417,17 @@ def main():
     if a.command == "compare":
         compare_runs(a.runs, a.out)
         return
-    c = config(a.config)
+    assert c is not None
     if a.command == "inspect":
-        m = inspect(c, a.out or "tmp/maskrf-inspect")
+        out = a.out or "tmp/maskrf-inspect"
+        if mask is None:
+            m = inspect(c, out)
+        else:
+            with tempfile.TemporaryDirectory(prefix="maskrf-inspect-") as directory:
+                path = Path(directory) / "mask.csv"
+                np.savetxt(path, mask, delimiter=",", fmt="%d")
+                c["geometry"]["file"] = str(path)
+                m = inspect(c, out)
         print(json.dumps({k: v for k, v in m.items() if k != "lines_mm"}, indent=2))
         return
     if a.command == "run":

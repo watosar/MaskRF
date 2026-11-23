@@ -12,33 +12,33 @@ Python 3.12と `uv` を使い、以下のコマンドはリポジトリのルー
 
 新規FDTD解析、形状・メッシュの生成、保存波形の再処理には、openEMS・CSXCADのPythonバインディング（PythonからC/C++の実装を呼び出す拡張モジュール）と、`libopenEMS.so`・`libCSXCAD.so` などの共有ライブラリが必要です。MaskRFはPythonバインディング経由で解析処理を呼び出し、`openEMS` 実行ファイルをコマンドとして起動することはありません。
 
-構築スクリプトの対象環境はUbuntu 24.04／x86_64です。`uv`、`git`、`cmake`、C/C++コンパイラ、Python 3.12開発ヘッダと、約5 GBの空き領域を用意してください。
+自動ビルドの対象環境はUbuntu 24.04／x86_64です。`uv`、`git`、`cmake`、C/C++コンパイラ、Python 3.12開発ヘッダと、約5 GBの空き領域を用意してください。
 
 ```bash
 uv sync --locked --inexact
-mkdir -p tmp/setup
-bash scripts/bootstrap.sh > tmp/setup/bootstrap.log 2>&1
-source env.sh
 ```
 
-[bootstrap.sh](scripts/bootstrap.sh)はopenEMS-Project v0.0.36の固定コミットとサブモジュールから、共有ライブラリとPythonバインディングをビルドします。共有ライブラリと依存するUbuntuパッケージは `.native/` へ展開し、システムへはインストールしません。Pythonバインディングは `.native/wheels/` にwheelを作成し、`.venv/` へインストールします。構築用ファイルは `tmp/native-build/` に保存します。他のOS・CPU向けの構築手順は検証していません。
+初めて解析を実行するときにopenEMS・CSXCADを読み込めなければ、`インストールしますか？ (Y/n):` と確認します。Enterまたは `y` で導入して解析を続け、`n` または入力なしの終了では導入せずに中止します。ヘルプ表示と保存済み結果の読み込みでは、この確認は行いません。
 
-`env.sh` は共有ライブラリを読み込めるように `LD_LIBRARY_PATH` を設定し、Matplotlibの作業先も指定します。openEMS・CSXCADの共有ライブラリを `.native/` 以外へ導入した場合は、sourceする前に `MASKRF_NATIVE` をその導入先のルートへ設定してください。
+導入を選ぶと、openEMS-Project v0.0.36の固定コミットから共有ライブラリとPythonバインディングをビルドします。依存するUbuntuパッケージもユーザー用ディレクトリへ展開します。Pythonバインディングは、そのコマンドを実行しているPython環境へ追加します。導入先とログの場所は確認時に表示します。
 
-openEMS・CSXCADのPythonバインディングを削除しないよう、環境の同期には `uv sync --locked --inexact` を使います。`.venv` を作り直した場合は、保存済みwheelを再導入してください。
+保存先は[XDG Base Directory仕様](https://specifications.freedesktop.org/basedir/latest/)に従います。
 
-```bash
-uv sync --locked --inexact
-uv pip install --python .venv/bin/python .native/wheels/*.whl
-source env.sh
-```
+| 用途 | 保存先 | 環境変数が未指定の場合 |
+|---|---|---|
+| 共有ライブラリ・wheel | `$XDG_DATA_HOME/maskrf/openems-0.0.36/` | `~/.local/share/maskrf/openems-0.0.36/` |
+| ダウンロード・ビルド | `$XDG_CACHE_HOME/maskrf/openems-0.0.36/` | `~/.cache/maskrf/openems-0.0.36/` |
+| 導入ログ | `$XDG_STATE_HOME/maskrf/` | `~/.local/state/maskrf/` |
+
+XDG変数が空または相対パスの場合も既定の場所を使います。共有ライブラリの読み込み設定はMaskRFが行います。
+
+環境の同期には、追加したPythonバインディングを残す `uv sync --locked --inexact` を使ってください。Python環境を作り直した場合も、次の解析時に導入を確認します。共有ライブラリとwheelが保存済みなら、再ビルドせずwheelを導入します。
 
 この手順がビルドするソースのバージョンはopenEMS 0.0.36／CSXCAD 0.6.3です。Pythonバインディングのwheelメタデータは0.0.33／0.6.2なので、導入版の確認にはビルドしたソースの版も使います。
 
 ## 新規解析
 
 ```bash
-source env.sh
 uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/example-response
 ```
 
@@ -77,7 +77,6 @@ s21 = response.s[:, 1, 0]
 
 ```bash
 uv sync --locked --inexact
-source env.sh
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright

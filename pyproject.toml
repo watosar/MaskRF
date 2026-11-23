@@ -26,6 +26,16 @@ where = ["src"]
 [tool.setuptools.package-data]
 maskrf = ["configs/*.yaml", "data/*.csv"]
 
+[tool.setuptools.data-files]
+"share/maskrf/scripts" = [
+    "scripts/bootstrap.sh",
+    "scripts/build_native.sh",
+    "scripts/build_bindings.sh",
+    "scripts/paths.sh",
+    "scripts/repair_library_links.py",
+    "scripts/requirements-native.txt",
+]
+
 [dependency-groups]
 dev = [
     "pyright>=1.1.414",

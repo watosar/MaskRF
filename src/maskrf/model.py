@@ -1,6 +1,6 @@
 import numpy as np
 
-from .geometry import boxes, load_mask
+from .geometry import boxes, load_mask, terminal_boxes
 
 
 def build(c, excitation=1):
@@ -38,6 +38,7 @@ def build(c, excitation=1):
         0 if g["kind"] != "mask" else load_mask(g["file"]).shape[1] * g["pitch_mm"] / 2
     )
     length = p["feed_length_mm"] + half
+    port_end = half + p.get("neck", {}).get("length_mm", 0)
     for axis, limits in [("x", [-length, length]), ("y", domain["y_mm"])]:
         mesh.AddLine(axis, limits)
     if g["kind"] == "mask":
@@ -55,6 +56,23 @@ def build(c, excitation=1):
         mesh.AddLine(
             "x", [-w / 2 - outside, -w / 2 + inside, w / 2 - inside, w / 2 + outside]
         )
+    terminals = terminal_boxes(c, half)
+    subdivisions = m.get("pixel_subdivisions", 1)
+    wide_edges = {y + sign * w / 2 for y in p["y_mm"] for sign in (-1, 1)}
+    for start, stop in terminals:
+        for index, axis, limits in (
+            (0, "x", (-length, length)),
+            (1, "y", domain["y_mm"]),
+        ):
+            lower, upper = start[index], stop[index]
+            if not limits[0] <= lower < upper <= limits[1]:
+                raise ValueError("Terminal metal must fit inside the substrate")
+            positions = np.linspace(lower, upper, subdivisions + 1).tolist()
+            if axis == "y":
+                # An exact line at a wide feed edge would override its thirds-rule cell.
+                positions = [pos for pos in positions if pos not in wide_edges]
+            if positions:
+                mesh.AddLine(axis, positions)
     for y in p["y_mm"]:
         mesh.AddLine(
             "y",
@@ -88,6 +106,13 @@ def build(c, excitation=1):
             mesh.AddLine("x", [plane - step, plane + step])
     mesh.SmoothMeshLines("x", dx, 1.4)
     mesh.SmoothMeshLines("y", dx, 1.4)
+    if "neck" in p:
+        xs = np.asarray(mesh.GetLines("x"))
+        for sign in (-1, 1):
+            plane = sign * (length - p["measurement_shift_mm"])
+            plane_index = int(np.argmin(abs(xs - plane)))
+            if sign * xs[plane_index - sign] <= port_end:
+                raise ValueError("Measurement probes must remain on the wide feed")
     # Other mandatory grid lines can intrude into the requested edge cell.
     # Inspect the finished grid, not just the requested hint coordinates.
     edge_audit = []
@@ -126,7 +151,7 @@ def build(c, excitation=1):
     metal = cs.AddMetal("PEC")
     if c["metal"]["model"] != "PEC":
         raise ValueError("Only explicit PEC preliminary model is supported")
-    for start, stop in boxes(c):
+    for start, stop in [*boxes(c), *terminals]:
         metal.AddBox(start, stop, priority=10)
     for via in g.get("shorts", []):
         x, y = via["xy_mm"]
@@ -136,7 +161,7 @@ def build(c, excitation=1):
     for i, sign in enumerate([-1, 1]):
         y = p["y_mm"][i]
         start = [sign * length, y - w / 2, h]
-        stop = [sign * half, y + w / 2, 0]
+        stop = [sign * port_end, y + w / 2, 0]
         ports.append(
             fdtd.AddMSLPort(
                 i + 1,

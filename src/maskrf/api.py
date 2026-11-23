@@ -12,6 +12,7 @@ import numpy as np
 import yaml
 
 from .geometry import load_mask, mask_audit
+from .runtime import prepare_solver
 
 DEFAULT_CONFIG = Path(__file__).resolve().parent / "configs/paper_corrected.yaml"
 
@@ -206,6 +207,12 @@ def evaluate_mask(mask, out_dir, *, config_path=None):
             "evaluate_mask requires excitations [1, 2] for a full S matrix"
         )
     out_dir = Path(out_dir).resolve()
+    if out_dir.exists():
+        raise FileExistsError(out_dir)
+    try:
+        environment = prepare_solver()
+    except RuntimeError as error:
+        raise SimulationError(str(error)) from error
     out_dir.mkdir(parents=True, exist_ok=False)
     np.savetxt(out_dir / "mask.csv", array, delimiter=",", fmt="%d")
     config["geometry"]["file"] = str(out_dir / "mask.csv")
@@ -235,7 +242,11 @@ def evaluate_mask(mask, out_dir, *, config_path=None):
         ]
         with (out_dir / "execution.log").open("w") as log:
             result = subprocess.run(
-                command, stdout=log, stderr=subprocess.STDOUT, check=False
+                command,
+                stdout=log,
+                stderr=subprocess.STDOUT,
+                check=False,
+                env=environment,
             )
         if result.returncode:
             raise SimulationError(

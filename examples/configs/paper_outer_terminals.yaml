@@ -1,0 +1,53 @@
+name: 'Fig. 3(a): external shorts and narrow feed ends'
+geometry:
+  kind: mask
+  file: ../data/fig3a-mask.csv
+  pitch_mm: 0.125
+  shorts:
+    - xy_mm: [-0.9375, 1.0625]
+      width_mm: 0.125
+      pad_width_mm: 0.125
+    - xy_mm: [-0.3125, -1.0625]
+      width_mm: 0.125
+      pad_width_mm: 0.125
+substrate:
+  thickness_mm: 0.16764
+  epsilon_r: 3.66
+  conductivity_S_m: 0
+metal:
+  model: PEC
+  thickness_mm: 0.035
+ports:
+  type: MSL
+  width_mm: 0.35
+  y_mm: [-0.5625, -0.6875]
+  feed_length_mm: 12
+  feed_shift_mm: 2
+  measurement_shift_mm: 3
+  reference_ohm: 50
+  neck:
+    length_mm: 0.125
+    width_mm: 0.125
+domain:
+  y_mm: [-3, 3]
+  air_top_mm: 3
+boundary: [PML_8, PML_8, MUR, MUR, PEC, MUR]
+frequency_GHz: [10, 30, 401]
+mesh:
+  edge_rule: thirds
+  local_mm: 0.0125
+  max_mm: 0.20
+  pixel_subdivisions: 4
+  probe_step_mm: 0.025
+  substrate_cells: 8
+  verify_feed_edges: true
+solver:
+  end_criteria: 1.0e-06
+  excitations: [1, 2]
+  max_cells: 10000000
+  max_steps: 400000
+  threads: 2
+  timeout_s: 7200
+validation:
+  complex_delta_tolerance: 0.02
+  passband_GHz: [10, 14]

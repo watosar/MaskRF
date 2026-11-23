@@ -4,6 +4,7 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
 import subprocess
 import tempfile
 import unittest
@@ -24,6 +25,11 @@ spec.loader.exec_module(example)
 
 
 class ScoreMaskTests(unittest.TestCase):
+    def setUp(self):
+        ready = patch("maskrf.api.prepare_solver", return_value=dict(os.environ))
+        ready.start()
+        self.addCleanup(ready.stop)
+
     def test_squared_and_maximum_errors(self):
         # Amplitude errors are 0 and .6. MSE=.18; RMSE=sqrt(.18); max=.6.
         expected = {"mae": 0.3, "mse": 0.18, "rmse": 0.4242640687119285, "max": 0.6}

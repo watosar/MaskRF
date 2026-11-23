@@ -15,9 +15,31 @@
 
 CSVはヘッダなしの16行×16列、JSONは二次元配列そのものを入力する。18×18の端子込み表現の自動変換や、孤立金属の除去、角接触の接続・切断などの形状修正は行わない。
 
-標準設定は[同梱YAML](../src/maskrf/configs/paper_corrected.yaml)にある。条件を変更する場合は[編集用設定例](../examples/configs/paper_corrected.yaml)をコピーし、APIの `config_path` またはCLIの `--config` に渡す。マスク評価には `geometry.kind: mask` と `solver.excitations: [1, 2]` が必要である。設定の長さはmm、周波数は `frequency_GHz: [開始, 終了, 点数]` で指定する。低位の `run`・`inspect` コマンドでは、`geometry.file` をYAMLの所在からの相対パスとして解決する。`evaluate_mask` はその値を入力マスクの保存先へ置き換える。
+標準設定は[同梱YAML](../src/maskrf/configs/paper_corrected.yaml)にある。条件を変更する場合は[編集用設定例](../examples/configs/paper_corrected.yaml)をコピーし、APIの `config_path` またはCLIの `--config` に渡す。設定の長さはmm、周波数は `frequency_GHz: [開始, 終了, 点数]` で指定する。
+
+`evaluate_mask` では引数 `mask`、`maskrf evaluate` と `maskrf inspect` では `--mask` でマスクを指定できる。マスクの評価には `geometry.kind: mask` と `solver.excitations: [1, 2]` が必要である。`run`・`convergence` または `inspect --config` でYAMLからマスクを指定する場合は、`geometry.file` にCSVまたは白黒PNGのパスを書く。相対パスの起点はYAMLを置いたディレクトリである。
 
 材料・形状・格子の変更には個別の精度確認が必要である。図3(a)について確認した格子差を、変更後の設定や任意マスクの誤差上限として使わない。
+
+### 短絡と給電線の設定
+
+CSVは中央16×16の金属パターンを指定する。短絡と給電線の位置・寸法は設定YAMLで指定する。マスク中心を原点とし、右が+x、上が+yである。
+
+| 設定 | 内容 |
+|---|---|
+| `geometry.shorts[].xy_mm`、`width_mm` | 短絡ごとの中心 `[x, y]` と、基板を貫通する正方形の導体の一辺 |
+| `geometry.shorts[].pad_width_mm` | 任意。短絡と同じ中心に置く上面金属パッドの一辺。マスク外に短絡を置く場合は、パッドがマスク端の金属に接するように位置と幅を指定する |
+| `ports.y_mm`、`ports.width_mm` | 左右の給電線の中心 `[左のy, 右のy]` と、左右共通の線幅 |
+| `ports.neck.length_mm`、`width_mm` | 任意。マスクに接する側の区間の長さと幅。左右に共通で、幅は `ports.width_mm` 以下とする。区間の長さは `feed_length_mm` に含まれ、励振と測定は外側の区間に置く |
+
+[図3(a)の外周短絡と細い給電接続の設定例](../examples/configs/paper_outer_terminals.yaml)では、2か所の外周パッドと、長さ・幅とも0.125 mmの給電先端を指定している。形状確認と解析には同じYAMLを渡す。
+
+```bash
+uv run maskrf inspect --mask examples/data/fig3a-mask.csv --config examples/configs/paper_outer_terminals.yaml --out tmp/outer-terminals-inspect
+uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --config examples/configs/paper_outer_terminals.yaml --out tmp/outer-terminals-run
+```
+
+給電幅を変更して給電線の縁の格子検査に失敗した場合は、`mesh.local_mm` を小さくして `inspect` で確認する。
 
 ## 2. Python API
 
@@ -35,7 +57,7 @@ s21 = response.s[:, 1, 0]
 print(response.metrics["first_downward_3dB_GHz"])
 ```
 
-`evaluate_mask(mask, out_dir, *, config_path=None)` は同期処理である。毎回、両ポートを独立に励振して新規解析するため、openEMS・CSXCADのPythonバインディングと共有ライブラリが必要になる。標準設定では数十分以上かかる。出力先は未使用のディレクトリにする。
+`evaluate_mask(mask, out_dir, *, config_path=None)` は同期処理である。毎回、両ポートを独立に励振して新規解析するため、openEMS・CSXCADのPythonバインディングと共有ライブラリが必要になる。未導入なら `(Y/n)` で導入を確認し、承諾後にインストールして解析を続ける。拒否または入力なしの終了では `SimulationError` となり、出力先は作成しない。標準設定の解析は数十分以上かかる。出力先は未使用のディレクトリにする。
 
 | 戻り値 | 内容 |
 |---|---|
@@ -62,9 +84,7 @@ s21 = saved.s[:, 1, 0]
 ## 3. CLIと保存結果
 
 ```bash
-source env.sh
 uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/circuit-01
-uv run maskrf inspect --config examples/configs/paper_corrected.yaml --out tmp/inspect-01
 ```
 
 ### evaluate のオプション
@@ -81,6 +101,8 @@ CLIは `uv run python -m maskrf` からも呼び出せる。
 
 `evaluate` は成功時に応答JSONを標準出力と `response.json` に返す。失敗時は非ゼロ終了となり、エラーJSONを標準エラーに出す。解析開始後の失敗は `error.json` にも残す。入力やソルバのログは出力先へ保存する。
 
+初回の導入確認と進捗案内は標準エラーに表示する。導入に失敗した場合はXDGの状態ディレクトリに保存したログの場所を示す。保存先と必要なツールは[README](../README.md#導入)を参照する。
+
 | 主なファイル | 内容 |
 |---|---|
 | `mask.csv`・`request.yaml`・`request.json` | 入力マスク、実際に渡した設定、入力のハッシュと形状監査 |
@@ -90,9 +112,34 @@ CLIは `uv run python -m maskrf` からも呼び出せる。
 | `run/sparameters.csv`・`run/network.s2p` | 全複素SのCSVとTouchstone |
 | `run/solver-*.log`・`run/excite-*/` | 励振ごとのログと波形 |
 
+### inspect で回路形状を確認する
+
+`inspect` は解析モデルと計算格子を組み立て、励振を実行せずに形状図を出力する。次の例はマスクCSVと同梱の標準設定を使う。モデルの組み立てにはopenEMS・CSXCADのPythonバインディングと共有ライブラリが必要で、未導入の場合は `(Y/n)` で導入を確認する。
+
+```bash
+uv run maskrf inspect --mask examples/data/fig3a-mask.csv --out tmp/inspect-01
+```
+
+| オプション | 必須 | 意味 |
+|---|---|---|
+| `--mask PATH` | `--config` 省略時に必須 | 描画する16×16マスク。CSV・JSON・白黒PNGのいずれか |
+| `--config YAML` | `--mask` 省略時に必須 | 形状と計算格子を定義する解析設定。省略時は同梱の標準設定 |
+| `--out DIR` | 任意 | 出力先。省略時は `tmp/maskrf-inspect` |
+
+両方を指定すると、金属パターンは `--mask` のファイルから、基板・給電線などの条件は `--config` のYAMLから読み込む。設定YAMLにマスクのパスが含まれていれば、`inspect --config YAML` でも描画できる。
+
+| 出力ファイル | 内容 |
+|---|---|
+| `geometry.png` | 金属パターン、給電線、測定面、短絡位置を示す平面図と、基板・GNDの概略断面図 |
+| `geometry.xml` | openEMS・CSXCADで使用する形状のXML |
+| `mesh.json` | 各軸の格子座標、セル数、給電線の縁における格子の確認結果 |
+| `geometry-audit.json` | マスクの寸法、金属セル数、接続成分数など |
+
+標準出力には格子座標を除いた `mesh.json` の内容をJSONで表示する。
+
 ### 解析・比較コマンド
 
-低位の解析操作は次のとおりである。`compare` と `postprocess` は保存波形を再処理するため、openEMS・CSXCADのPythonバインディングと共有ライブラリも必要になる。`convergence` は設定の `convergence` に列挙した各格子で新規解析し、設定した段階間の差を計算する。
+`run` は設定YAMLを使って新規解析を実行する。`convergence` は設定の `convergence` に列挙した各格子で新規解析し、段階間の差を計算する。`compare` と `postprocess` は保存波形を再処理するため、openEMS・CSXCADのPythonバインディングと共有ライブラリも必要になる。
 
 `run` と `convergence` は、各励振の正常終了と減衰を確認する。終了コード0でも減衰条件未達なら状態とログを保存して非ゼロ終了し、後続の励振・格子解析と通常の後処理へは進まない。`postprocess` は設定した全励振の波形が保存されている場合に診断用の再処理として使えるが、その処理の成功は解析の正常終了・減衰を意味しない。第1励振で停止して第2励振の波形がないrunは、そのまま全Sを再処理できない。
 
@@ -122,7 +169,7 @@ RMSE = sqrt(sum(e[k]**2) / N)
 uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --target examples/data/lowpass-target.csv --out tmp/score-01
 ```
 
-このコマンドは新規解析と採点を実行するため、READMEの手順でopenEMS・CSXCADを導入しておく。成功時の標準出力はfloatの1行だけで、応答は `response.json`、採点条件・値・比較振幅は `score.json`、入力ターゲットは `target.csv` に保存する。失敗時は標準エラーと非ゼロ終了になり、floatを返さない。
+このコマンドは新規解析と採点を実行し、openEMS・CSXCADが未導入なら `(Y/n)` で導入を確認する。成功時の標準出力はfloatの1行だけで、応答は `response.json`、採点条件・値・比較振幅は `score.json`、入力ターゲットは `target.csv` に保存する。失敗時は標準エラーと非ゼロ終了になり、floatを返さない。
 
 ### 採点スクリプトのオプション
 

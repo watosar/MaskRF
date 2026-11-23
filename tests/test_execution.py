@@ -2,11 +2,15 @@
 
 import copy
 import json
+import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+import numpy as np
+import yaml
 
 import maskrf.__main__ as cli
 from maskrf import load_response
@@ -42,6 +46,9 @@ class ExecutionTests(unittest.TestCase):
         directory = tempfile.TemporaryDirectory(prefix="maskrf-execution-")
         self.addCleanup(directory.cleanup)
         self.directory = Path(directory.name)
+        ready = patch.object(cli, "prepare_solver", return_value=dict(os.environ))
+        ready.start()
+        self.addCleanup(ready.stop)
 
     def workers(self, outputs):
         iterator = iter(outputs)
@@ -51,6 +58,53 @@ class ExecutionTests(unittest.TestCase):
             return Worker(log, code, stdout)
 
         return patch.object(cli.subprocess, "Popen", side_effect=launch)
+
+    def test_inspect_accepts_mask_with_default_or_custom_config(self):
+        mask = np.zeros((16, 16), dtype=int)
+        mask[3, 5] = 1
+        csv_path = self.directory / "input.csv"
+        np.savetxt(csv_path, mask, delimiter=",", fmt="%d")
+        json_path = self.directory / "input.json"
+        json_path.write_text(json.dumps(mask.tolist()))
+        settings = copy.deepcopy(self.config)
+        settings["geometry"].pop("file")
+        settings["substrate"]["epsilon_r"] = 4.4
+        custom = self.directory / "custom.yaml"
+        custom.write_text(yaml.safe_dump(settings))
+        out = self.directory / "inspection"
+
+        def inspect_config(config, destination):
+            np.testing.assert_array_equal(
+                cli.load_mask(config["geometry"]["file"]), mask
+            )
+            self.assertEqual(config["substrate"]["epsilon_r"], epsilon_r)
+            self.assertEqual(Path(destination), out)
+            return {"lines_mm": {}, "cells": 10}
+
+        for path, options, epsilon_r in (
+            (csv_path, [], 3.66),
+            (json_path, ["--config", str(custom)], 4.4),
+        ):
+            with (
+                self.subTest(path=path),
+                patch.object(
+                    sys,
+                    "argv",
+                    [
+                        "maskrf",
+                        "inspect",
+                        "--mask",
+                        str(path),
+                        "--out",
+                        str(out),
+                        *options,
+                    ],
+                ),
+                patch.object(cli, "inspect", side_effect=inspect_config) as inspect,
+                patch("builtins.print"),
+            ):
+                cli.main()
+                inspect.assert_called_once()
 
     def test_run_rejects_undecayed_before_next_excitation(self):
         out = self.directory / "run"

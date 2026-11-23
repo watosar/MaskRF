@@ -10,7 +10,7 @@ import yaml
 FIXTURE = Path(__file__).resolve().parent / "fixtures/completed-run"
 
 
-def complete_solver(command, *, stdout, stderr, check):
+def complete_solver(command, *, stdout, stderr, check, env):
     config_path = Path(command[command.index("--config") + 1])
     out = Path(command[command.index("--out") + 1])
     config = yaml.safe_load(config_path.read_text())
