@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Plot the report's saved responses through the public library API."""
 
 import argparse

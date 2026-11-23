@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import numpy as np
 
 from .geometry import boxes, load_mask, terminal_boxes

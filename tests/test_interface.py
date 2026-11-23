@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Contract and failure-path tests; native smoke simulation is run separately."""
 
 import contextlib

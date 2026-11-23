@@ -3,6 +3,7 @@ name = "maskrf"
 version = "0.1.0"
 description = "RF S-parameter simulation from binary metal masks with openEMS"
 readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "numpy==1.26.4",

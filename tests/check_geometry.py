@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Focused checks of coordinate convention and rejection of invalid mask data."""
 
 import tempfile

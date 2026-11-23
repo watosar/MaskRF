@@ -6,7 +6,7 @@
 
 NumPy配列・CSV・JSON・白黒PNGを受け取り、基板・給電・短絡を含むモデルを解析します。S11・S12・S21・S22をCSV・Touchstone・JSONで保存でき、ターゲットS21とのRMSEを返す採点スクリプトも用意しています。
 
-Guoらの論文 *Dall-EM*（IMS 2025）図3(a)の回路をopenEMSで解析し、論文図から読み取ったHFSSのS21振幅と比較しました。10.5–18 GHzの16点（0.5 GHz間隔）におけるS21振幅の誤差は、dB値のRMSEで0.58 dBでした。10.5 GHzではopenEMSの計算値がHFSSの読取値より0.88 dB低い値でした。[再現条件と比較結果](docs/reproduction-report.ja.md)
+Guoらの論文 *Dall-EM*（IMS 2025）図3(a)の回路を、外周短絡と細い給電接続を指定した再現用設定で解析しました。論文図から読み取ったHFSSのS21振幅とdB値で比較すると、10.5–18 GHzの16点（0.5 GHz間隔）でRMSEは0.58 dBでした。10.5 GHzではopenEMSの計算値がHFSSの読取値より0.88 dB低い値でした。[再現コマンド](#図3aの再現) · [比較結果](docs/reproduction-report.ja.md)
 
 ## 導入
 
@@ -44,7 +44,7 @@ XDG変数が空または相対パスの場合も既定の場所を使います�
 uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/example-response
 ```
 
-両ポートを独立に励振し、応答JSONを標準出力と `tmp/example-response/response.json` に保存します。標準設定では数十分以上かかります。出力先は未使用のディレクトリにしてください。
+このコマンドは、内側短絡と一定幅の給電線を使う同梱設定で解析します。両ポートを独立に励振し、応答JSONを標準出力と `tmp/example-response/response.json` に保存します。解析には数十分以上かかります。出力先は未使用のディレクトリにしてください。
 
 新規解析とターゲット採点をまとめて行う場合は、次のスクリプトを使います。
 
@@ -53,6 +53,14 @@ uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --targe
 ```
 
 このスクリプトも新規解析を実行し、同梱の理想ローパスターゲットに対する線形振幅のRMSEを1行で出力します。引数は[evaluateのオプション](docs/usage.ja.md#evaluate-のオプション)と[採点スクリプトのオプション](docs/usage.ja.md#採点スクリプトのオプション)、Python APIや入力形式は[利用方法](docs/usage.ja.md)に記載しています。
+
+## 図3(a)の再現
+
+RMSE 0.58 dBを得た比較では、外周短絡、細い給電接続、1画素4分割の格子を使いました。同じ条件で解析するには、図3(a)のマスクCSVと再現用YAMLを指定します。[マスクCSV](examples/data/fig3a-mask.csv) · [再現用YAML](examples/configs/paper_outer_terminals.yaml)
+
+```bash
+uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --config examples/configs/paper_outer_terminals.yaml --out tmp/fig3a-reproduction
+```
 
 ## 保存済み結果の読み込み
 
@@ -101,3 +109,7 @@ uv build --out-dir tmp/dist
 | [scripts](scripts/) | openEMS・CSXCADのビルドと導入 |
 | [docs](docs/) | 現在の利用仕様と検証結果、掲載図 |
 | `tmp/`（Git管理外） | 作業用ファイル、実行結果、検証の証拠 |
+
+## ライセンス
+
+MaskRF本体はGNU General Public Licenseのバージョン3またはそれ以降で提供します。導入時にビルドするopenEMSとCSXCADのPythonバインディングには、それぞれGPLv3以降とLGPLv3以降が適用されます。比較に使った第三者由来データの出典と配布条件は保存データ一覧に記載しています。[MaskRFのライセンス](LICENSE) · [openEMSのライセンス情報](https://github.com/thliebig/openEMS/blob/5f36e7f3a2367123f00999491a069aed50c6f244/python/setup.py) · [CSXCADのライセンス情報](https://github.com/thliebig/CSXCAD/blob/3861f2102aa9d13fbb0edb115fe446aeca6a0c13/python/setup.py) · [データの出典と配布](docs/data/README.ja.md#データの出典と配布)

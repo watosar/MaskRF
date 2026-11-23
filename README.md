@@ -6,7 +6,7 @@ MaskRF is a Python library that uses openEMS to compute the complex S-parameters
 
 MaskRF accepts NumPy arrays, CSV, JSON, and black-and-white PNG files. It models the substrate, feed lines, and shorts, and saves S11, S12, S21, and S22 in CSV, Touchstone, and JSON. A scoring script computes the RMSE against a target S21 response.
 
-We simulated the circuit in Fig. 3(a) of Guo et al., *Dall-EM* (IMS 2025), in openEMS and compared its S21 magnitude with the HFSS curve digitized from the paper. Across 16 points from 10.5 to 18 GHz at 0.5 GHz intervals, the RMSE of the S21 magnitude in dB was 0.58 dB. At 10.5 GHz, the openEMS result was 0.88 dB below the digitized HFSS value. [Reproduction setup and comparison results](docs/reproduction-report.md)
+We simulated the circuit in Fig. 3(a) of Guo et al., *Dall-EM* (IMS 2025), in openEMS using the reproduction configuration with peripheral shorts and narrow feed connections. The RMSE of S21 magnitude in dB against the digitized HFSS curve was 0.58 dB across 16 points from 10.5 to 18 GHz at 0.5 GHz intervals. At 10.5 GHz, the openEMS result was 0.88 dB below the digitized HFSS value. [Reproduction command](#reproducing-fig-3a) · [Comparison results](docs/reproduction-report.md)
 
 ## Installation
 
@@ -44,7 +44,7 @@ This procedure builds openEMS 0.0.36 and CSXCAD 0.6.3. The binding wheels report
 uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/example-response
 ```
 
-MaskRF excites the two ports independently, writes the response JSON to standard output, and saves it as `tmp/example-response/response.json`. The bundled settings take tens of minutes or more. Choose an output directory that does not yet exist.
+This command uses the bundled settings with interior shorts and constant-width feeds. MaskRF excites the two ports independently, writes the response JSON to standard output, and saves it as `tmp/example-response/response.json`. The run usually takes tens of minutes or more. Choose an output directory that does not yet exist.
 
 To run a new analysis and score the result against a target, use the scoring script.
 
@@ -53,6 +53,14 @@ uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --targe
 ```
 
 The script runs a new analysis and prints the linear-magnitude RMSE against the bundled ideal low-pass target on one line. The usage guide lists the arguments, Python API, and input formats. [Evaluate options](docs/usage.md#evaluate-options) · [Scoring script options](docs/usage.md#scoring-script-options) · [Usage guide](docs/usage.md)
+
+## Reproducing Fig. 3(a)
+
+Pass the Fig. 3(a) mask and the reproduction YAML to use the peripheral shorts, narrow feed connections, and four subdivisions per pixel from the 0.58 dB comparison. [Mask CSV](examples/data/fig3a-mask.csv) · [Reproduction YAML](examples/configs/paper_outer_terminals.yaml)
+
+```bash
+uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --config examples/configs/paper_outer_terminals.yaml --out tmp/fig3a-reproduction
+```
 
 ## Loading saved results
 
@@ -101,3 +109,7 @@ The tests use bundled response data and run without openEMS, CSXCAD, or previous
 | [scripts](scripts/) | openEMS and CSXCAD build and installation scripts |
 | [docs](docs/) | Usage specifications, verification results, and figures |
 | `tmp/` (ignored by Git) | Working files, run outputs, and verification records |
+
+## License
+
+The original MaskRF software is available under the GNU General Public License, version 3 or any later version. The openEMS and CSXCAD Python bindings built during setup carry GPLv3-or-later and LGPLv3-or-later terms, respectively. The data index records the sources and redistribution status of the third-party material used for comparisons. [MaskRF license](LICENSE) · [openEMS license metadata](https://github.com/thliebig/openEMS/blob/5f36e7f3a2367123f00999491a069aed50c6f244/python/setup.py) · [CSXCAD license metadata](https://github.com/thliebig/CSXCAD/blob/3861f2102aa9d13fbb0edb115fe446aeca6a0c13/python/setup.py) · [Data sources and redistribution](docs/data/README.md#data-sources-and-redistribution)

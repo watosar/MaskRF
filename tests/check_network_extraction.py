@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Run the production network-extraction regression independently."""
 
 import unittest

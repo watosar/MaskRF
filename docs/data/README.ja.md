@@ -16,6 +16,18 @@
 
 原論文のHFSS曲線と先行COMSOL曲線は画像からの読取値で、ソルバの数値出力原本ではない。読取範囲と座標由来の誤差は各JSONに記載する。原論文と先行実装の出典URLはレポートの参考資料にまとめている。
 
+## データの出典と配布
+
+MaskRFのライセンスは本体のソフトウェアに適用する。下記の第三者の図から読み取った資料については、再配布条件を確認できていない。読取値を載せた比較図と抽出マスクの形状図も対象となり、過去のGitコミットにある版も含む。[MaskRFのライセンス](../../LICENSE) · [IEEEの再利用案内](https://journals.ieeeauthorcenter.ieee.org/choose-a-publishing-agreement/avoid-infringement-upon-ieee-copyright/)
+
+| 資料 | 出典 | 保存先 |
+|---|---|---|
+| 16×16のマスク | Guoらの論文図3(a)から読み取った金属パターン。[原論文](https://doi.org/10.1109/IMS40360.2025.11103838) | [再現用入力](../../examples/data/fig3a-mask.csv)と[テスト用](../../tests/fixtures/completed-run/mask.csv) |
+| HFSSのS21の参照値 | Guoらの論文図3(a)の紫色の曲線から読取。[原論文](https://doi.org/10.1109/IMS40360.2025.11103838) | [読取値](paper-hfss.csv)、[抽出条件](paper-extraction.json) |
+| 先行COMSOLの比較値 | `jwt625/Obsidian-Journals` の図から読んだS11・S21の振幅。[出典画像](https://github.com/jwt625/Obsidian-Journals/blob/67227f7579e27259e75e9fadcefe345f856e5137/10-30GHz.png) | [読取値](comsol-digitized.csv)、[比較指標](comsol-metrics.json) |
+
+Pythonパッケージには、本プロジェクトで作成した直線状の金属マスクを同梱する。Touchstoneファイルは、本プロジェクトでopenEMSを実行して求めた応答を収録する。HFSS読取値を重ねた比較図は、検証レポートで曲線の出典を示している。[同梱マスク](../../src/maskrf/data/example-mask.csv) · [検証レポート](../reproduction-report.ja.md)
+
 ## 給電・短絡
 
 内側短絡で給電端の幅を変えた粗格子試験は、[比較指標](feed-comparison.json)、[固定条件](feed-controlled-variables.json)、[検査結果](feed-final-checks.json)を保存する。短絡除去の試験は[終了状態](no-shorts-status.json)に示すとおり減衰未達で、有効な全Sを得ていない。

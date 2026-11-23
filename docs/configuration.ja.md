@@ -18,7 +18,7 @@ CLIでは `--config`、Python APIでは `evaluate_mask(..., config_path=...)` �
 | キー | 意味 | 型と範囲 | 同梱値 |
 |---|---|---|---|
 | `geometry.kind` | 生成する回路の種類。`mask` は入力の金属パターンを中央に配置し、左右の給電線と、設定した短絡を加える。他の値は[直線線路とノッチの補足](#補足-直線線路とノッチの検証)を参照する | マスク回路では `mask`。`evaluate` と `--mask` を使う `inspect` はこの値を要求する | `mask` |
-| `geometry.file` | 金属マスクのファイル | `mask` 用のCSVまたは白黒PNGのパス。相対パスの起点はYAMLのあるディレクトリ。`evaluate` と `inspect` の `--mask`、またはAPIの `mask` 引数で指定した入力が優先される | `../data/fig3a-mask.csv` |
+| `geometry.file` | 金属マスクのファイル | `mask` 用のCSVまたは白黒PNGのパス。相対パスの起点はYAMLのあるディレクトリ。`evaluate` と `inspect` の `--mask`、またはAPIの `mask` 引数で指定した入力が優先される | `../data/example-mask.csv` |
 | `geometry.pitch_mm` | マスク1画素の一辺。16×16マスクの一辺はピッチの16倍 | `mask` 用の正の実数。CLIは正であることを検査する | 0.125 |
 | `geometry.shorts` | 基板を貫通し、上面から裏面GNDへ接続する短絡の一覧 | 任意。下記の項目を持つマッピングのリスト。空なら短絡なし | 2件 |
 | `geometry.shorts[].xy_mm` | 短絡と上面パッドの中心 | 実数2つ `[x, y]`。短絡全体を領域内に収める。パッド付きの場合はパッドの範囲を構築時に検査する | `[-0.9375, 0.9375]`、`[-0.3125, -0.9375]` |

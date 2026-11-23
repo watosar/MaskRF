@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Resolve dev-package links whose runtime library was already installed on Ubuntu."""
 
 import os

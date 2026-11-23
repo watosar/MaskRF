@@ -39,7 +39,7 @@ frequency_GHz:
 - 30
 - 401
 geometry:
-  file: ../data/fig3a-mask.csv
+  file: ../data/example-mask.csv
   kind: mask
   pitch_mm: 0.125
   shorts:

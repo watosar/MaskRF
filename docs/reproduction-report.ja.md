@@ -188,9 +188,9 @@
 
 公開APIとCLIは、16×16のマスクからモデルを組み立て、両励振の結果から全複素Sを求め、入力・設定・応答を保存する。外周短絡と細い給電接続を含む第3節の回路は、再現用の設定例を `inspect` や `evaluate` の `--config` に渡して指定できる。[利用方法](usage.ja.md#短絡と給電線の設定) · [再現用の設定例](../examples/configs/paper_outer_terminals.yaml)
 
-同梱の標準YAMLと完了済み応答のfixtureは内側短絡・一定幅給電の9分割モデルに対応する。このモデルの短絡中心は（x, y）= (−0.9375, +0.9375) と (−0.3125, −0.9375) mmである。[標準YAML](../src/maskrf/configs/paper_corrected.yaml) · [編集用設定例](../examples/configs/paper_corrected.yaml) · [保存済み応答](../tests/fixtures/README.ja.md)
+完了済み応答のfixtureは、図3(a)のマスクを同梱設定の内側短絡・一定幅給電・1画素9分割で解析した結果である。このモデルの短絡中心は（x, y）= (−0.9375, +0.9375) と (−0.3125, −0.9375) mmである。[標準YAML](../src/maskrf/configs/paper_corrected.yaml) · [編集用設定例](../examples/configs/paper_corrected.yaml) · [保存済み応答](../tests/fixtures/README.ja.md)
 
-同梱設定を `maskrf inspect` で描くと、平面図と基板・裏面GNDの概略断面図を確認できる。赤線はSパラメータの測定面、青い四角は短絡角柱の平面投影である。[同梱設定の形状図](figures/fig3a-package-example.svg)
+`maskrf inspect --mask examples/data/fig3a-mask.csv` を実行すると、このマスクを同梱設定で描画できる。図には平面図と基板・裏面GNDの概略断面図を表示する。赤線はSパラメータの測定面、青い四角は短絡角柱の平面投影である。[同梱設定の形状図](figures/fig3a-package-example.svg)
 
 APIは二値配列・CSV・JSON・白黒PNGを受け付け、全Sの複素値・振幅・位相、指標、実効設定を返す。新規解析では両励振の正常終了と減衰を確認し、完了済みの応答は `load_response()` で読み込める。個別の格子収束や受動性による自動選別は未実装である。wheelを独立環境に入れ、ソースディレクトリ外から利用できることも確認した。内側短絡・一定幅給電の9分割データを生成したコア実装は、保存時の記録で `model.py`、`geometry.py`、`postprocess.py` の一致を確認している。[コア実装の照合](data/report-metrics.json)
 

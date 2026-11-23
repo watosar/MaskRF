@@ -16,6 +16,18 @@ This directory contains the data behind the numerical results and figures in the
 
 The published HFSS curve and the prior COMSOL curves were digitized from images. The corresponding JSON files record the digitization range and the uncertainty due to image coordinates. The report's references identify the original paper and prior implementations.
 
+## Data sources and redistribution
+
+The MaskRF license covers the original software. Redistribution terms for the material extracted from the following third-party figures are unverified. This also applies to figures that redraw the digitized traces or show the recovered mask, including copies in earlier Git commits. [MaskRF license](../../LICENSE) · [IEEE guidance on reuse](https://journals.ieeeauthorcenter.ieee.org/choose-a-publishing-agreement/avoid-infringement-upon-ieee-copyright/)
+
+| Material | Source | Location |
+|---|---|---|
+| 16×16 mask | Metal pattern read from Guo et al., Fig. 3(a). [Paper](https://doi.org/10.1109/IMS40360.2025.11103838) | [Reproduction input](../../examples/data/fig3a-mask.csv) and [test fixture](../../tests/fixtures/completed-run/mask.csv) |
+| HFSS S21 reference | Magnitudes digitized from the purple trace in Guo et al., Fig. 3(a). [Paper](https://doi.org/10.1109/IMS40360.2025.11103838) | [Readings](paper-hfss.csv) and [extraction settings](paper-extraction.json) |
+| Earlier COMSOL comparison | S11 and S21 magnitudes digitized from the plot in `jwt625/Obsidian-Journals`. [Source image](https://github.com/jwt625/Obsidian-Journals/blob/67227f7579e27259e75e9fadcefe345f856e5137/10-30GHz.png) | [Readings](comsol-digitized.csv) and [comparison metrics](comsol-metrics.json) |
+
+The Python package ships an original example mask with a straight metal strip. The Touchstone files contain the project's own openEMS simulation results. The reproduction report identifies which figures display the digitized HFSS trace alongside those results. [Bundled example mask](../../src/maskrf/data/example-mask.csv) · [Reproduction report](../reproduction-report.md)
+
 ## Feeds and shorts
 
 The coarse-grid study with internal shorts varied the width at the feed ends. The results include the comparison metrics, the fixed settings, and the verification checks. A separate test removed the shorts. It failed to reach the decay criterion, so it yielded no valid full S-matrix. [Comparison metrics](feed-comparison.json) · [Fixed settings](feed-controlled-variables.json) · [Verification checks](feed-final-checks.json) · [Completion status](no-shorts-status.json)

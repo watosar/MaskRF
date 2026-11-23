@@ -18,7 +18,7 @@ The origin is the center of the mask, with +x to the right and +y up. CSV row 0 
 | Key | Meaning | Type and range | Bundled value |
 |---|---|---|---|
 | `geometry.kind` | Circuit geometry to generate. `mask` places the input metal pattern at the center and adds the left and right feeds and any configured shorts. See the [appendix on straight and notch models](#appendix-on-straight-and-notch-models) for other values | `mask` for a mask circuit. Required by `evaluate` and `inspect --mask` | `mask` |
-| `geometry.file` | Metal mask file | Path to a CSV or black-and-white PNG for `mask`. Relative paths resolve from the directory containing the YAML. The input passed through `--mask` to `evaluate` or `inspect`, or through the API's `mask` argument, takes precedence | `../data/fig3a-mask.csv` |
+| `geometry.file` | Metal mask file | Path to a CSV or black-and-white PNG for `mask`. Relative paths resolve from the directory containing the YAML. The input passed through `--mask` to `evaluate` or `inspect`, or through the API's `mask` argument, takes precedence | `../data/example-mask.csv` |
 | `geometry.pitch_mm` | Side length of one mask pixel. A side of the 16×16 mask is 16 times the pitch | Positive real number for `mask`. The CLI checks that it is positive | 0.125 |
 | `geometry.shorts` | List of shorts through the substrate, connecting the top surface to the back ground plane | Optional list of mappings with the fields below. An empty list creates no shorts | 2 entries |
 | `geometry.shorts[].xy_mm` | Center of the short and its top pad | Pair of real numbers `[x, y]`. The entire short must fit in the domain. If a pad is specified, MaskRF checks its bounds when building the model | `[-0.9375, 0.9375]`, `[-0.3125, -0.9375]` |

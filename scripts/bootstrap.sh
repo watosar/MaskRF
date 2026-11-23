@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Ubuntu 24.04, x86_64; requires uv, git, cmake, a C/C++ compiler, Python headers.
 set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"

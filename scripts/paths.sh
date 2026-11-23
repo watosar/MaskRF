@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Shared XDG locations; sourcing this file does not create directories.
 case "${XDG_DATA_HOME:-}" in
  /*) MASKRF_DATA_HOME="$XDG_DATA_HOME" ;;

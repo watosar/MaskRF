@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 source "$script_dir/paths.sh"

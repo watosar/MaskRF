@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Mask-to-circuit interface for the existing two-port simulation model."""
 
 import copy

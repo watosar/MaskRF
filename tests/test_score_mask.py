@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 watosar
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Check target units, amplitude scoring, and the public-API consumer CLI."""
 
 import contextlib
