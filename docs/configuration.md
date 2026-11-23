@@ -1,119 +1,121 @@
-# 解析設定YAMLリファレンス
+# YAML configuration reference
 
-CLIでは `--config`、Python APIでは `evaluate_mask(..., config_path=...)` に解析設定を渡す。指定したYAMLには、そのコマンドが使う項目を一式記載する。表の「同梱値」は、`evaluate` やマスクを直接指定した `inspect` で `--config` を省略したときに使う同梱YAMLの値を示す。論文図3(a)の外周短絡を含む回路には、再現用YAMLを使う。[同梱YAML](../src/maskrf/configs/paper_corrected.yaml) · [再現用YAML](../examples/configs/paper_outer_terminals.yaml)
+[日本語](configuration.ja.md)
 
-「型と範囲」はモデルを組むための条件である。MaskRFが明示的に検査する条件は表に記した。整数の刻みは1。実数で指定する寸法、座標、材料定数などに固定の入力刻みはない。解析で形状の差を表現できるかは、生成した格子とその上での材料・導体の扱いに依存する。[格子間隔の確認](#格子間隔の確認)に、寸法を小さく変えた例を示す。位置と長さの単位はmmである。
+Pass simulation settings through `--config` in the CLI or `evaluate_mask(..., config_path=...)` in the Python API. The YAML file must include all the settings used by the command. The "Bundled value" column shows the values used by `evaluate` and by `inspect` with a mask if `--config` is omitted. Use the reproduction YAML for the Fig. 3(a) circuit with shorts outside the mask. [Bundled YAML](../src/maskrf/configs/paper_corrected.yaml) · [Reproduction YAML](../examples/configs/paper_outer_terminals.yaml)
 
-| キー | 意味 | 型と範囲 |
+"Type and range" lists the conditions for building a model and identifies the checks that MaskRF performs explicitly. Integer settings have a step of 1. Real-valued dimensions, coordinates, and material constants can be entered without a fixed increment. Whether a geometry change appears in the simulation depends on the generated grid and how materials and conductors are represented on it. See [Checking grid spacing](#checking-grid-spacing) for an example with a small change in dimension. Positions and lengths are in millimeters.
+
+| Key | Meaning | Type and range |
 |---|---|---|
-| `name` | 形状図に表示する名前 | 文字列 |
-| `assumptions` | モデルの仮定や出典のメモ | 任意。文字列のリスト。記録用 |
+| `name` | Name displayed in the geometry drawing | String |
+| `assumptions` | Notes on modeling assumptions or sources | Optional list of strings for recordkeeping |
 
-## マスク回路の形状と材料
+## Mask geometry and materials
 
-マスクの中心を原点とし、右が +x、上が +y である。CSVの行0は +y 側、列0は −x 側に対応する。APIの `mask` 引数とCLIの `--mask` は16×16の二値マスクを受け付ける。CSVでは1が金属、0が空白である。厚さ方向は裏面GNDを z = 0 とし、上面金属を基板の上に置く。
+The origin is the center of the mask, with +x to the right and +y up. CSV row 0 corresponds to the +y side and column 0 to the −x side. The API's `mask` argument and the CLI's `--mask` accept a 16×16 binary mask. A CSV uses 1 for metal and 0 for empty space. The ground plane is on the underside of the substrate at z = 0, and the top metal lies on the substrate.
 
-| キー | 意味 | 型と範囲 | 同梱値 |
+| Key | Meaning | Type and range | Bundled value |
 |---|---|---|---|
-| `geometry.kind` | 生成する回路の種類。`mask` は入力の金属パターンを中央に配置し、左右の給電線と、設定した短絡を加える。他の値は[直線線路とノッチの補足](#補足-直線線路とノッチの検証)を参照する | マスク回路では `mask`。`evaluate` と `--mask` を使う `inspect` はこの値を要求する | `mask` |
-| `geometry.file` | 金属マスクのファイル | `mask` 用のCSVまたは白黒PNGのパス。相対パスの起点はYAMLのあるディレクトリ。`evaluate` と `inspect` の `--mask`、またはAPIの `mask` 引数で指定した入力が優先される | `../data/fig3a-mask.csv` |
-| `geometry.pitch_mm` | マスク1画素の一辺。16×16マスクの一辺はピッチの16倍 | `mask` 用の正の実数。CLIは正であることを検査する | 0.125 |
-| `geometry.shorts` | 基板を貫通し、上面から裏面GNDへ接続する短絡の一覧 | 任意。下記の項目を持つマッピングのリスト。空なら短絡なし | 2件 |
-| `geometry.shorts[].xy_mm` | 短絡と上面パッドの中心 | 実数2つ `[x, y]`。短絡全体を領域内に収める。パッド付きの場合はパッドの範囲を構築時に検査する | `[-0.9375, 0.9375]`、`[-0.3125, -0.9375]` |
-| `geometry.shorts[].width_mm` | 正方形の短絡断面の一辺 | 正の実数 | 各0.125 |
-| `geometry.shorts[].pad_width_mm` | 短絡と同じ中心に置く、正方形の上面金属パッドの一辺 | 任意。正の有限実数。構築時に検査する。省略時はパッドなし | 省略 |
-| `substrate.thickness_mm` | 基板の厚さ | 正の実数 | 0.16764 |
-| `substrate.epsilon_r` | 基板の比誘電率 | 正の実数、無次元 | 3.66 |
-| `substrate.conductivity_S_m` | 基板の導電率（S/m） | 0以上の実数。0で誘電体の吸収損失を省く | 0 |
-| `metal.model` | 導体モデル | `PEC` のみ。構築時に検査する | `PEC` |
-| `metal.thickness_mm` | 上面金属の厚さ | 0以上の実数。0で厚さゼロのPEC面 | 0.035 |
+| `geometry.kind` | Circuit geometry to generate. `mask` places the input metal pattern at the center and adds the left and right feeds and any configured shorts. See the [appendix on straight and notch models](#appendix-on-straight-and-notch-models) for other values | `mask` for a mask circuit. Required by `evaluate` and `inspect --mask` | `mask` |
+| `geometry.file` | Metal mask file | Path to a CSV or black-and-white PNG for `mask`. Relative paths resolve from the directory containing the YAML. The input passed through `--mask` to `evaluate` or `inspect`, or through the API's `mask` argument, takes precedence | `../data/fig3a-mask.csv` |
+| `geometry.pitch_mm` | Side length of one mask pixel. A side of the 16×16 mask is 16 times the pitch | Positive real number for `mask`. The CLI checks that it is positive | 0.125 |
+| `geometry.shorts` | List of shorts through the substrate, connecting the top surface to the back ground plane | Optional list of mappings with the fields below. An empty list creates no shorts | 2 entries |
+| `geometry.shorts[].xy_mm` | Center of the short and its top pad | Pair of real numbers `[x, y]`. The entire short must fit in the domain. If a pad is specified, MaskRF checks its bounds when building the model | `[-0.9375, 0.9375]`, `[-0.3125, -0.9375]` |
+| `geometry.shorts[].width_mm` | Side length of the short's square cross section | Positive real number | 0.125 each |
+| `geometry.shorts[].pad_width_mm` | Side length of a square top metal pad centered on the short | Optional positive finite real number. MaskRF validates it when building the model. Omit to create the short without a pad | Omitted |
+| `substrate.thickness_mm` | Substrate thickness | Positive real number | 0.16764 |
+| `substrate.epsilon_r` | Relative permittivity of the substrate | Positive real number, dimensionless | 3.66 |
+| `substrate.conductivity_S_m` | Substrate conductivity in S/m | Nonnegative real number. Use 0 to omit dielectric absorption loss | 0 |
+| `metal.model` | Conductor model | `PEC` only. Validated when building the model | `PEC` |
+| `metal.thickness_mm` | Top metal thickness | Nonnegative real number. Use 0 for a zero-thickness PEC surface | 0.035 |
 
-マスク外に短絡を置くときは、上面パッドがマスク端の金属に接するように中心と幅を指定する。
+For an external short, set the center and width of its top pad so the pad touches the metal at the mask edge.
 
-## 給電と測定
+## Feeds and measurement
 
-ポート1は −x 側、ポート2は +x 側にある。励振面と測定面の距離は両方とも給電線の外端から回路に向かって測る。
+Port 1 is on the −x side and port 2 is on the +x side. Distances to the excitation and measurement planes are measured from the outer end of each feed line toward the circuit.
 
-| キー | 意味 | 型と範囲 | 同梱値 |
+| Key | Meaning | Type and range | Bundled value |
 |---|---|---|---|
-| `ports.type` | ポート種別のメモ。実装はMSL（マイクロストリップ線路）を使う | 記録用。例では `MSL` | `MSL` |
-| `ports.y_mm` | 左右の給電線の中心 | 実数2つ `[ポート1のy, ポート2のy]`。中心の両側に `ports.width_mm` の半分を含めて `domain.y_mm` に収める | `[-0.5625, -0.6875]` |
-| `ports.width_mm` | 左右共通の給電線幅 | 正の実数 | 0.35 |
-| `ports.feed_length_mm` | 左右共通の片側の長さ。外端からマスク端までで、絞り部を含む | 正の実数 | 12 |
-| `ports.feed_shift_mm` | 外端から励振面までの距離 | 0以上で給電線長より小さい実数。絞りを使う場合は広い区間に収める | 2 |
-| `ports.measurement_shift_mm` | 外端からSパラメータの測定面までの距離 | 0より大きく給電線長より小さい実数。隣接するプローブも給電線内に収める | 3 |
-| `ports.reference_ohm` | Sパラメータを正規化する、両ポート共通の基準インピーダンス（Ω） | 正の実数 | 50 |
-| `ports.neck` | 左右の給電線で、回路への接続部だけ幅を変える設定 | 任意。指定する場合は下記の長さと幅を両方記載する。省略時は一定幅 | 省略 |
-| `ports.neck.length_mm` | マスク端から外側に向けた絞り部の長さ | 正の実数。構築時に下記の上限を検査する | 省略 |
-| `ports.neck.width_mm` | 絞り部の幅 | 正の実数で `ports.width_mm` 以下。構築時に検査する | 省略 |
+| `ports.type` | Note on the port type. The model uses microstrip line (MSL) ports | For recordkeeping. The examples use `MSL` | `MSL` |
+| `ports.y_mm` | Center of each feed line | Pair of real numbers `[port 1 y, port 2 y]`. Each line must fit in `domain.y_mm`, including half of `ports.width_mm` on either side of its center | `[-0.5625, -0.6875]` |
+| `ports.width_mm` | Common width of the two feed lines | Positive real number | 0.35 |
+| `ports.feed_length_mm` | Common length of a feed line from its outer end to the mask edge, including any neck | Positive real number | 12 |
+| `ports.feed_shift_mm` | Distance from the outer end to the excitation plane | Real number at least 0 and smaller than the feed length. With a neck, the plane must be in the wider section | 2 |
+| `ports.measurement_shift_mm` | Distance from the outer end to the S-parameter measurement plane | Real number greater than 0 and smaller than the feed length. The adjacent probes must also fit within the feed line | 3 |
+| `ports.reference_ohm` | Common reference impedance in Ω used to normalize the S-parameters | Positive real number | 50 |
+| `ports.neck` | Setting that changes the width of each feed where it connects to the circuit | Optional mapping. Specify both the length and width below when used. Omit for constant-width feeds | Omitted |
+| `ports.neck.length_mm` | Length of the neck from the mask edge toward the outer end | Positive real number. MaskRF checks the upper bound below when building the model | Omitted |
+| `ports.neck.width_mm` | Neck width | Positive real number at most `ports.width_mm`. Validated when building the model | Omitted |
 
-絞りを入れるときは、励振面と測定用プローブの両方を広い区間に置く。構築時には、絞り部の長さが `feed_length_mm − max(feed_shift_mm, measurement_shift_mm + probe_step_mm)` より小さいことを検査する。式の `probe_step_mm` は `mesh.probe_step_mm` で、省略時の式には0を使う。平滑化後の格子でも、測定面から回路側に隣接する格子線が広い区間にあることを検査する。
+With a neck, the excitation plane and the measurement probes must lie in the wider section. MaskRF checks that the neck length is less than `feed_length_mm − max(feed_shift_mm, measurement_shift_mm + probe_step_mm)`. The formula uses `mesh.probe_step_mm` for `probe_step_mm`, or 0 if the setting is omitted. After grid smoothing, MaskRF also checks that the grid line next to the measurement plane on the circuit side is still in the wider section.
 
-## 計算領域と周波数
+## Domain and frequencies
 
-x方向の領域端は、マスク幅の半分に `ports.feed_length_mm` を加えた位置の正負にある。
+The domain extends in both x directions from the origin by half the mask width plus `ports.feed_length_mm`.
 
-| キー | 意味 | 型と範囲 | 同梱値 |
+| Key | Meaning | Type and range | Bundled value |
 |---|---|---|---|
-| `domain.y_mm` | y方向の領域の両端 | 実数2つ `[下限, 上限]`。下限 < 上限。基板上の形状を収める | `[-3, 3]` |
-| `domain.air_top_mm` | GNDを基準とした計算領域の上端のz座標 | 基板厚と金属厚の和より大きい実数 | 3 |
-| `boundary` | 計算領域の6面の境界条件 | 順番は `[-x, +x, -y, +y, -z, +z]`。文字列は `PEC`（電気壁）、`PMC`（磁気壁）、`MUR`（吸収境界）、`PML_n`（nセルの吸収層、nは正の整数）。CLIは6面の指定と −z が `PEC` であることを検査する | `[PML_8, PML_8, MUR, MUR, PEC, MUR]` |
-| `frequency_GHz` | 励振帯域と、Sパラメータを求める周波数点 | `[開始, 終了, 点数]`。開始と終了は実数で 0 ≤ 開始 < 終了、点数は2以上の整数。CLIは点数の下限を検査する | `[10, 30, 401]` |
+| `domain.y_mm` | Bounds of the domain along y | Pair of real numbers `[lower, upper]` with lower < upper. The structures on the substrate must fit within the bounds | `[-3, 3]` |
+| `domain.air_top_mm` | Top z coordinate of the domain measured from the ground plane | Real number greater than the sum of the substrate and metal thicknesses | 3 |
+| `boundary` | Boundary conditions for the six faces of the domain | Ordered as `[-x, +x, -y, +y, -z, +z]`. String options are `PEC` (electric wall), `PMC` (magnetic wall), `MUR` (absorbing boundary), and `PML_n` (absorbing layer of n cells, with n a positive integer). The CLI checks that all six faces are specified and that −z is `PEC` | `[PML_8, PML_8, MUR, MUR, PEC, MUR]` |
+| `frequency_GHz` | Excitation band and frequencies at which to calculate S-parameters | `[start, stop, count]`. Start and stop are real numbers with 0 ≤ start < stop. Count is an integer of at least 2. The CLI checks the lower bound on count | `[10, 30, 401]` |
 
-底面以外の境界条件には整数も指定できる。`0`、`1`、`2`、`3` は順に `PEC`、`PMC`、`MUR`、`PML_8` に対応する。
+The other five boundary conditions also accept integers. Values `0`, `1`, `2`, and `3` correspond to `PEC`, `PMC`, `MUR`, and `PML_8`, respectively.
 
-出力周波数は両端を含む等間隔で、間隔は `(終了 − 開始) / (点数 − 1)` GHzである。同梱値では0.05 GHz（50 MHz）になる。FDTDの時間刻みはソルバが格子や材料から決める。
+The output frequencies are evenly spaced and include both endpoints. The spacing is `(stop − start) / (count − 1)` GHz, 0.05 GHz (50 MHz) with the bundled values. The solver determines the FDTD time step from the grid and materials.
 
-## 計算格子
+## Computational grid
 
-| キー | 意味 | 型と範囲 | 同梱値 |
+| Key | Meaning | Type and range | Bundled value |
 |---|---|---|---|
-| `mesh.max_mm` | 格子を平滑化するときの各軸の最大間隔 | 正の実数 | 0.075 |
-| `mesh.local_mm` | 主に広い給電線の縁の両側に置く格子線の間隔 | 正の実数 | 約0.004167 |
-| `mesh.pixel_subdivisions` | マスク1画素あたりのx・y方向の分割数。パッドと絞り部に追加する格子にも使う | 正の整数。`mask` で必須 | 9 |
-| `mesh.substrate_cells` | 平滑化前の基板厚方向の等分割数 | 正の整数 | 16 |
-| `mesh.edge_rule` | `mesh.local_mm` を導体の内側と外側に配分する規則 | `thirds` は内側1/3・外側2/3、`legacy` は内側2/3・外側1/3。構築時に選択肢を検査する。省略時は `legacy` | `thirds` |
-| `mesh.probe_step_mm` | 測定面の前後にx格子線を追加する距離 | 任意。正の実数。構築時に検査する | 0.025 |
-| `mesh.verify_feed_edges` | 広い給電線の縁をまたぐセルで、実際の導体内側の比率が1/3になるか検査する | 任意。`true` または `false`。省略時は `false`。`true` で比率が条件を満たさなければモデルの構築を中止する | `true` |
+| `mesh.max_mm` | Maximum spacing along each axis when smoothing the grid | Positive real number | 0.075 |
+| `mesh.local_mm` | Spacing between grid lines placed mainly on either side of the edges of the wider feed sections | Positive real number | About 0.004167 |
+| `mesh.pixel_subdivisions` | Number of subdivisions in x and y per mask pixel. Also used to add grid lines at pads and necks | Positive integer. Required for `mask` | 9 |
+| `mesh.substrate_cells` | Number of equal subdivisions through the substrate thickness before smoothing | Positive integer | 16 |
+| `mesh.edge_rule` | Rule for dividing `mesh.local_mm` between the inside and outside of the conductor | `thirds` assigns 1/3 inside and 2/3 outside. `legacy` assigns 2/3 inside and 1/3 outside. Validated when building the model. Defaults to `legacy` if omitted | `thirds` |
+| `mesh.probe_step_mm` | Distance from the measurement plane to the added x grid lines on either side | Optional positive real number. Validated when building the model | 0.025 |
+| `mesh.verify_feed_edges` | Whether to check that the conductor occupies the required 1/3 of the cell straddling each edge of the wider feed section | Optional `true` or `false`. Defaults to `false`. With `true`, a failed ratio check stops model construction | `true` |
 
-### 格子間隔の確認
+### Checking grid spacing
 
-マスク部分には、画素境界と `geometry.pitch_mm / mesh.pixel_subdivisions` 間隔の格子線を入れる。ピッチ0.125 mm、1画素4分割ではこの間隔は0.03125 mmである。給電線の縁、測定面、領域の端などにも格子線を入れるため、生成後の格子間隔は場所ごとに変わる。
+The grid includes the pixel boundaries and lines spaced by `geometry.pitch_mm / mesh.pixel_subdivisions` in the mask. A pitch of 0.125 mm divided into 4 subdivisions gives a spacing of 0.03125 mm. MaskRF also places grid lines at feed edges, measurement planes, and domain boundaries, so the final spacing varies by location.
 
-寸法を変えても、格子と、格子上での材料・導体の扱い、励振・測定の条件が同じなら、FDTDで解くモデルは同じになる。MaskRFは設定値から格子を組み立てるため、給電幅や測定面の指定を変えると格子線も動く。たとえば再現用YAMLの `ports.width_mm` を0.35 mmから0.3501 mmに変えると、給電線の縁を挟む格子線は0.00005 mmずつ移動する。このような小さな寸法差による応答の変化を評価するときは、格子を細かくしても応答差が保たれるかを調べる。
+Two geometries with different dimensions produce the same FDTD model if they share the grid, material and conductor representation, excitation, and measurement conditions. MaskRF builds the grid from the settings, so changing a feed width or a measurement plane can move grid lines. For example, changing `ports.width_mm` from 0.35 mm to 0.3501 mm in the reproduction YAML moves each grid line bordering a feed edge by 0.00005 mm. When evaluating a response change due to such a small dimension change, check whether the difference persists on a finer grid.
 
-寸法の変更をどの格子で解くかは、`inspect` が出力する `mesh.json` の `lines_mm` で確認できる。各軸で隣り合う座標の差が、その位置の格子間隔である。再現用YAMLで生成した格子の最小間隔は、x方向で0.025 mm、y方向で約0.004167 mm、z方向で0.020955 mmである。給電の縁を横切るセルは `feed_edge_audit` に記録する。[inspect の使い方](usage.md#inspect-で回路形状を確認する)
+To see the grid that represents a dimension change, check `lines_mm` in the `mesh.json` produced by `inspect`. The difference between adjacent coordinates along each axis is the local grid spacing. For the reproduction YAML, the minimum spacings are 0.025 mm in x, about 0.004167 mm in y, and 0.020955 mm in z. Cells that straddle feed edges are recorded in `feed_edge_audit`. [Inspecting the circuit geometry](usage.md#inspecting-the-circuit-geometry)
 
-## ソルバと比較指標
+## Solver and comparison metrics
 
-| キー | 意味 | 型と範囲 | 同梱値 |
+| Key | Meaning | Type and range | Bundled value |
 |---|---|---|---|
-| `solver.excitations` | 独立に励振するポート番号を順に指定する | `1` と `2` から選ぶリスト。全S行列には両方の励振が必要。`evaluate` は `[1, 2]` を要求する | `[1, 2]` |
-| `solver.max_steps` | 1励振あたりのFDTD時間ステップ数の上限 | 正の整数 | 400000 |
-| `solver.end_criteria` | 解析終了の判定に使う、現在の推定エネルギーをそれまでの最大値で割った比の上限 | 0より大きく1より小さい実数、無次元。`1.0e-06` は −60 dB | `1.0e-07` |
-| `solver.max_cells` | 構築を許す計算セル数の上限。各軸の格子点数から1を引いた値の積と比較する | 正の整数。構築時に検査する | 10000000 |
-| `solver.threads` | 1励振あたりのソルバのスレッド数 | 0以上の整数。0でopenEMSが自動選択する | 4 |
-| `solver.timeout_s` | 1励振あたりの実行時間の上限（秒） | 正の実数 | 7200 |
-| `validation.passband_GHz` | S21の通過域の最小・最大振幅と、比較時の最大差を集計する区間 | 実数2つ `[下限, 上限]`。下限 ≤ 上限で、出力周波数点を1点以上含む | `[10, 14]` |
-| `validation.complex_delta_tolerance` | `compare` と `convergence` で、複素Sの差の最大絶対値に許す上限 | 0以上の実数、無次元。省略時は0.02 | 0.02 |
-| `convergence` | `maskrf convergence` で順に計算する格子の設定 | `convergence` コマンドで必須。`mesh` のキーを持つマッピングのリスト。各段階で指定した項目を元の `mesh` に上書きする。段階間を比較するには2件以上を指定する | 1画素8分割と9分割の2段階 |
+| `solver.excitations` | Port numbers in the order in which they are independently excited | List with entries from `1` and `2`. Both excitations are required for the full S-matrix. `evaluate` requires `[1, 2]` | `[1, 2]` |
+| `solver.max_steps` | Maximum number of FDTD time steps per excitation | Positive integer | 400000 |
+| `solver.end_criteria` | Upper bound on the ratio of the current estimated energy to its maximum so far, used to determine when the simulation can stop | Real number greater than 0 and less than 1, dimensionless. `1.0e-06` corresponds to −60 dB | `1.0e-07` |
+| `solver.max_cells` | Maximum allowed number of computational cells, compared against the product of the number of intervals along each axis (grid points minus one) | Positive integer. Validated when building the model | 10000000 |
+| `solver.threads` | Number of solver threads per excitation | Nonnegative integer. Use 0 to let openEMS choose automatically | 4 |
+| `solver.timeout_s` | Time limit per excitation in seconds | Positive real number | 7200 |
+| `validation.passband_GHz` | Frequency interval for reporting the minimum and maximum S21 magnitudes and the maximum difference in a comparison | Pair of real numbers `[lower, upper]` with lower ≤ upper. The interval must include at least one output frequency | `[10, 14]` |
+| `validation.complex_delta_tolerance` | Maximum absolute difference allowed for complex S-parameters in `compare` and `convergence` | Nonnegative real number, dimensionless. Defaults to 0.02 if omitted | 0.02 |
+| `convergence` | Grid settings for successive runs of `maskrf convergence` | Required by the `convergence` command. List of mappings with keys from `mesh`. Each stage overrides the specified entries in the base `mesh`. Provide at least two stages to compare them | Two stages with 8 and 9 subdivisions per pixel |
 
-新規解析の正常終了判定には `solver.end_criteria` の達成が含まれる。格子間の比較では、複素Sの差に加え、通過域のS21振幅差と下降側−3 dB交差周波数の差を調べる。比較結果の各フィールドは利用ガイドに記載している。[解析・比較コマンド](usage.md#解析比較コマンド)
+A successful new simulation must meet `solver.end_criteria`. Grid comparisons check differences in the full complex S-matrix, the passband S21 magnitude, and the frequency of the downward −3 dB crossing. See the usage guide for the fields in the comparison results. [Analysis and comparison commands](usage.md#analysis-and-comparison-commands)
 
-## 補足 直線線路とノッチの検証
+## Appendix on straight and notch models
 
-直線線路で伝送・反射と格子細分化の影響を確認するときは `geometry.kind: straight`、枝線による透過の落ち込みを確認するときは `geometry.kind: notch` を使う。両形状は左右の給電線を x = 0 で直接突き合わせる。x方向の領域端は ±`ports.feed_length_mm` である。設定例のYAMLを `inspect --config` に渡すと形状を確認でき、`run --config` に渡すと解析できる。
+Use `geometry.kind: straight` to check transmission, reflection, and the effects of grid refinement on a straight line. Use `geometry.kind: notch` to check the drop in transmission caused by a stub. In both geometries, the left and right feed lines meet directly at x = 0. The x boundaries of the domain are at ±`ports.feed_length_mm`. To inspect or simulate a model, pass its YAML to `inspect --config` or `run --config`, respectively.
 
-### 直線線路（`straight`）
+### Straight transmission line (`straight`)
 
-一定幅の給電線で左右の `ports.y_mm` を同じ値にすると、幅 `ports.width_mm` の1本の線路になる。設定例では左右とも y = 0、幅0.35 mm、片側の長さ13 mmで、計算する線路は全長26 mmである。[直線線路の設定例](../examples/configs/straight_fine.yaml)
+Set the same `ports.y_mm` for both feeds to form a single constant-width line of width `ports.width_mm`. The example uses y = 0, a width of 0.35 mm, and a length of 13 mm on each side, giving a 26 mm line. [Straight-line configuration](../examples/configs/straight_fine.yaml)
 
-### スタブ付き線路（`notch`）
+### Open-stub transmission line (`notch`)
 
-中央の線路から +y 方向に、先端が開放された枝線（スタブ）を1本付ける。設定例では `ports.y_mm: [0, 0]` で、線路の +y 側の縁にスタブの根元を接続する。スタブによるS21の落ち込みを調べるときは、長さを `geometry.stub_mm` で指定する。[スタブ付き線路の設定例](../examples/configs/notch.yaml)
+One open-ended stub extends from the central line toward +y. The example uses `ports.y_mm: [0, 0]`, with the base of the stub connected to the +y edge of the line. Set the length in `geometry.stub_mm` to study the S21 notch. [Open-stub configuration](../examples/configs/notch.yaml)
 
-| キー | 意味 | 型と範囲 | 設定例の値 |
+| Key | Meaning | Type and range | Example value |
 |---|---|---|---|
-| `geometry.stub_mm` | 根元から開放端までの長さ | 正の実数。先端を `domain.y_mm` の上限内に収める | 12 |
+| `geometry.stub_mm` | Length from the base to the open end | Positive real number. The open end must lie within the upper bound of `domain.y_mm` | 12 |
 
-スタブの中心は x = 0 に固定される。幅を `w = ports.width_mm` とすると、スタブは x方向に `−w/2` から `+w/2`、y方向に `w/2` から `w/2 + geometry.stub_mm` を占める。`ports.y_mm` は左右の線路の中心だけを指定する。スタブ付きの設定例では幅0.6 mm、根元 y = 0.3 mm、先端 y = 12.3 mmである。
+The stub is centered at x = 0. With `w = ports.width_mm`, it spans `−w/2` to `+w/2` in x and `w/2` to `w/2 + geometry.stub_mm` in y. `ports.y_mm` sets the center of each feed line only. In the stub example the width is 0.6 mm, the base is at y = 0.3 mm, and the open end is at y = 12.3 mm.

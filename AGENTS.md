@@ -1,8 +1,9 @@
-# 指示
+# Instructions
 
-## ルール
+[日本語](AGENTS.ja.md)
 
-*   python 利用には常に uv を使う
-*   作業用ファイルは %workspace%/tmp で適切にディレクトリを切って管理し、作業の記録・証拠を残す
+## Rules
 
-* ライブラリ本体は `src/`、保守対象のテスト・セットアップ手順は `tests/`・`scripts/` に置く。`tmp/` は作業用ファイル・実行結果・確認記録の保存先とする。
+- Always use `uv` when running Python.
+- Keep working files in task-specific subdirectories of the workspace's `tmp/`. Save work records and verification evidence there.
+- Keep the library in `src/`, maintained tests in `tests/`, and setup procedures in `scripts/`. Use `tmp/` for working files, run outputs, and verification records.

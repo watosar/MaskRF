@@ -1,38 +1,40 @@
-# 図3(a)の条件と仮定
+# Conditions and assumptions for Fig. 3(a)
 
-以下の表は同梱の標準YAMLに対応する内側短絡・一定幅給電モデルの設定を記録する。図3(a)の外周短絡と細い給電接続を反映したモデルの設定と応答は[再現レポート](../reproduction-report.md#2-図3aのモデル)を参照する。
+[日本語](conditions.ja.md)
 
-対象は Guo et al., *Dall-EM*, IMS 2025, DOI 10.1109/IMS40360.2025.11103838。原論文の[DOI](https://doi.org/10.1109/IMS40360.2025.11103838)を参照する。図3(a)は給電線寸法とHFSS曲線が併記され、製造ばらつきを含まないため選定した。図4の実測値とは比較しない。
+The table records the model with internal shorts and uniform-width feeds used by the bundled YAML. The reproduction report gives the settings and response for the model with external shorts and narrow feed ends from Fig. 3(a). [Model for Fig. 3(a)](../reproduction-report.md#2-model-for-fig-3a)
 
-| 条件 | 採用値／扱い | 根拠 | 状態 |
+The source is Guo et al., *Dall-EM*, IMS 2025, DOI 10.1109/IMS40360.2025.11103838. Fig. 3(a) provides feed dimensions and an HFSS curve, so it supports comparison without manufacturing variation. The simulated response in Fig. 3(a) serves as the comparison reference. Fig. 4 reports prototype measurements. [Original paper](https://doi.org/10.1109/IMS40360.2025.11103838)
+
+| Condition | Value or treatment | Basis | Status |
 |---|---|---|---|
-| 金属領域の幅・高さ | 2 mm × 2 mm | PDF p.2 図2、p.3 図3(a) | 確認済み |
-| 学習用行列 | 18×18 | p.2 II-B、図2 | 確認済み |
-| 図3(a)内側の格子 | 16×16、ピッチ0.125 mm | 図3(a)の縦横15本の内部境界と2 mm寸法、図2の各辺16個の端子候補を照合（[分割の計測値](grid-measurements.json)） | 内側の分割を図から確認／入力外周との対応は図からの判断 |
-| 最小線幅／隙間 | 原則1画素、角接触あり | 図3(a)読み取り | 推定 |
-| 導体層 | 基板上面、裏面GND | 図2 | 確認済み |
-| 基板 | RO4350B、6.6 mil = 0.16764 mm、εr≈3.66 | 図2の画像内注記 | 確認済み |
-| 誘電損失・分散 | 論文値不明。採用モデルは導電率0、一定εr | 論文全4ページに値なし | 不明／仮定 |
-| 金属厚 | 35 µm | 図2 | 確認済み |
-| 導電率・粗さ | 不明。採用モデルはPEC | 論文に値なし | 不明／仮定 |
-| GNDの範囲・厚さ | 全計算領域の底面z=0をPEC境界 | 図2にGND plane、範囲不明 | 仮定 |
-| AC GND | 上辺左端・下辺左から6列目 | 図3(a)青記号、図1凡例shorting via | 位置は推定 |
-| 短絡形状 | 幅0.125 mmの角柱PECを基板貫通 | ビア径・めっき・ランド未記載 | 仮定 |
-| 給電線幅 | 0.35 mm | 図3(a)右側注記 | 確認済み |
-| 給電線長 | 両側12 mm | 図3(a)右側12 mm。左側は同長と仮定 | 右確認済み／左推定 |
-| 給電位置 | 左y=-0.5625 mm、右y=-0.6875 mm | 図3(a)画像の中心線 | 推定 |
-| ポート | openEMS MSL port、電界z方向、参照GND z=0 | 原文p.3 III-Bはedge feed excitationsとだけ記載 | 仮定 |
-| 基準インピーダンス | 50 Ω | 原文に値なし | 仮定 |
-| 基準面 | 外端から3 mm内側（マスク端から9 mm） | 原文の基準面・デエンベディング不明 | 仮定 |
-| 基板横幅・空気高さ | y=-3..3 mm、z上端3 mm | 原文未記載 | 仮定 |
-| 境界 | x両側PML8、y両側・上面MUR、底面PEC | 公式Notch例を初期条件に採用。別計算で距離依存を確認 | 仮定 |
-| 周波数 | 10–30 GHz | p.2 II-B・図2 | 確認済み |
-| 元データの間隔 | 1 GHz、21点 | p.2 II-B | 確認済み |
-| 比較曲線 | 図3(a)紫線：HFSSのS21振幅 | p.3 III-B、図3 | 確認済み |
-| 比較対象の種別 | HFSS（目標帯域・CNN予測・実測とは区別） | p.3 III-B | 確認済み |
+| Width and height of the metal pattern | 2 mm × 2 mm | Fig. 2 on p. 2 and Fig. 3(a) on p. 3 of the PDF | Confirmed |
+| Training matrix | 18×18 | Section II-B and Fig. 2 on p. 2 | Confirmed |
+| Interior grid in Fig. 3(a) | 16×16, pitch 0.125 mm | Checked the 15 internal boundaries in each direction and the 2 mm dimension in Fig. 3(a) against the 16 candidate terminals per side in Fig. 2. [Grid measurements](grid-measurements.json) | Interior divisions confirmed from the figure. The correspondence with the input perimeter is inferred |
+| Minimum line width and gap | Generally one pixel, with corner contacts present | Fig. 3(a) | Estimated |
+| Conductor layers | Substrate top metal and backside ground | Fig. 2 | Confirmed |
+| Substrate | RO4350B, 6.6 mil = 0.16764 mm, εr ≈ 3.66 | Annotation in Fig. 2 | Confirmed |
+| Dielectric loss and dispersion | The model uses zero conductivity and constant εr | The four-page paper leaves these values unspecified | Unknown, model assumption |
+| Metal thickness | 35 µm | Fig. 2 | Confirmed |
+| Conductivity and roughness | PEC | The paper leaves these values unspecified | Unknown, model assumption |
+| Ground extent and thickness | PEC boundary across the entire bottom of the domain at z = 0 | Fig. 2 shows a ground plane with unspecified extent | Assumed |
+| AC ground | Leftmost pixel on the top edge and sixth pixel from the left on the bottom edge | Blue markers in Fig. 3(a) and the shorting-via legend in Fig. 1 | Positions inferred |
+| Short geometry | PEC pillar with a 0.125 mm square cross section through the substrate | Via diameter, plating, and pads are unspecified | Assumed |
+| Feed width | 0.35 mm | Annotation to the right of Fig. 3(a) | Confirmed |
+| Feed length | 12 mm on both sides | Fig. 3(a) labels the right feed 12 mm. The model uses the same length on the left | Right confirmed, left inferred |
+| Feed position | Left y = −0.5625 mm, right y = −0.6875 mm | Centerlines in Fig. 3(a) | Estimated |
+| Ports | openEMS MSL ports with the electric field along z and reference ground at z = 0 | Section III-B on p. 3 describes edge feed excitations | Assumed |
+| Reference impedance | 50 Ω | The paper leaves it unspecified | Assumed |
+| Reference plane | 3 mm inward from the outer end and 9 mm from the mask edge | The paper leaves the reference planes and de-embedding unspecified | Assumed |
+| Substrate width and air height | y from −3 to 3 mm, upper boundary at z = 3 mm | The paper leaves these dimensions unspecified | Assumed |
+| Boundaries | PML8 on both x faces, MUR on both y faces and the top, PEC on the bottom | Initial settings follow the official notch example. A separate run checked sensitivity to distance | Assumed |
+| Frequency range | 10–30 GHz | Section II-B and Fig. 2 on p. 2 | Confirmed |
+| Original sampling interval | 1 GHz, 21 points | Section II-B on p. 2 | Confirmed |
+| Comparison curve | Purple curve in Fig. 3(a), HFSS S21 magnitude | Section III-B and Fig. 3 on p. 3 | Confirmed |
+| Simulation used for comparison | HFSS | Section III-B and Fig. 3 on p. 3 identify separate target, CNN prediction, and measurement results | Confirmed |
 
-マスクは行0が+y、列0が−x、中心が原点、1が金属。0/1 CSVを直接読み込む。白黒PNGは黒=金属で、灰色画素があれば拒否する。抽出の位置・閾値・曖昧セルは [抽出条件](paper-extraction.json)。形状修復、隙間充填、孤立金属削除、角接触の変更は行っていない。角接触はFDTD離散化への依存が強いため、メッシュ差と別に形状の不確かさとして扱う。
+Row 0 lies on the +y side, column 0 on the −x side, and the origin at the center of the mask. MaskRF reads 0/1 CSV data directly with 1 for metal. In black-and-white PNGs, black denotes metal and gray pixels are rejected. The model preserves gaps, isolated metal, and corner contacts as extracted. Corner contacts are sensitive to FDTD discretization and contribute shape uncertainty alongside mesh differences. [Extraction settings, thresholds, and ambiguous cells](paper-extraction.json)
 
-HFSS曲線はPDF埋め込み画像の紫色から抽出した。軸座標と読み取り誤差は [抽出条件](paper-extraction.json)。−20 dB以下で見切れる範囲は値を作らず比較対象外とする。反射・位相・全S行列の参照データはない。
+The purple curve in the image embedded in the PDF provides the HFSS data. The comparison covers its visible range, including only values above the clipping near −20 dB. The available reference is transmission magnitude. [Axes and digitization uncertainty](paper-extraction.json)
 
-18×18入力表現は外周の端子情報を含み、金属配置領域は内側16×16と図から判断できる。[分割の計測値](grid-measurements.json)には端子候補数、16/18分割の画像当てはめ、既存マスクとの全セル一致を保存した。著者の原配列の数値符号は未取得である。
+The 18×18 input representation includes perimeter terminal information. The figures indicate that the metal pattern occupies the inner 16×16 cells. The original numerical encoding remains unavailable. [Terminal counts, 16- and 18-cell grid fits, and agreement across all mask cells](grid-measurements.json)

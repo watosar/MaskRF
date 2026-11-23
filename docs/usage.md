@@ -1,51 +1,53 @@
-# 利用方法
+# Usage
 
-導入とopenEMS・CSXCADの構築は[README](../README.md)を参照する。以下のコマンドはリポジトリのルートで実行し、Pythonの実行・環境管理には `uv` を使う。
+[日本語](usage.ja.md)
 
-## 1. マスクと設定
+See the [README](../README.md) for MaskRF setup and the openEMS and CSXCAD build. Run the commands below from the repository root and use `uv` to run Python and manage the environment.
 
-| 項目 | 仕様 |
+## 1. Masks and settings
+
+| Item | Specification |
 |---|---|
-| 入力 | 16×16のNumPy配列、二次元リスト、CSV、JSON配列、白黒PNG |
-| 数値 | 1＝金属、0＝空白。boolも使用可。非二値・非数値入力は拒否 |
-| PNG | 黒＝金属、白＝空白。灰色は拒否 |
-| 座標 | 行0が+y、列0が−x。マスク中心が原点 |
-| 標準寸法 | ピッチ0.125 mm、内側2 mm角 |
-| 付加する構造 | 設定に従う基板、裏面GND、給電線、短絡 |
+| Input | 16×16 NumPy array, nested list, CSV, JSON array, or black-and-white PNG |
+| Values | 1 for metal, 0 for empty space. Only these numeric values and their Boolean equivalents are accepted |
+| PNG | Black for metal, white for empty space. Pixels must be pure black or white |
+| Coordinates | Row 0 is on the +y side and column 0 is on the −x side. The mask center is the origin |
+| Default dimensions | 0.125 mm pitch, yielding a 2 mm square interior |
+| Added structures | Substrate, ground plane, feed lines, and shorts as specified in the configuration |
 
-CSVはヘッダなしの16行×16列、JSONは二次元配列そのものを入力する。18×18の端子込み表現の自動変換や、孤立金属の除去、角接触の接続・切断などの形状修正は行わない。
+A CSV must have 16 rows and 16 columns with no header. A JSON input must be the two-dimensional array itself. For an 18×18 representation with terminals, supply only the inner 16×16 mask. MaskRF uses the geometry as supplied, including any isolated metal and corner contacts.
 
-標準設定は[同梱YAML](../src/maskrf/configs/paper_corrected.yaml)にある。条件を変更する場合は[編集用設定例](../examples/configs/paper_corrected.yaml)をコピーし、APIの `config_path` またはCLIの `--config` に渡す。設定の長さはmm、周波数は `frequency_GHz: [開始, 終了, 点数]` で指定する。
+The defaults come from the [bundled YAML](../src/maskrf/configs/paper_corrected.yaml). To change the settings, copy the [editable example](../examples/configs/paper_corrected.yaml) and pass it as `config_path` in the API or `--config` in the CLI. Specify lengths in millimeters and frequencies as `frequency_GHz: [start, stop, count]`.
 
-各項目の意味、型、範囲、同梱値、格子や周波数の刻みは[解析設定YAMLリファレンス](configuration.md)を参照する。
+See the [YAML configuration reference](configuration.md) for each parameter's meaning, type, range, bundled value, and the grid and frequency spacings.
 
-`evaluate_mask` では引数 `mask`、`maskrf evaluate` と `maskrf inspect` では `--mask` でマスクを指定できる。マスクの評価には `geometry.kind: mask` と `solver.excitations: [1, 2]` が必要である。`run`・`convergence` または `inspect --config` でYAMLからマスクを指定する場合は、`geometry.file` にCSVまたは白黒PNGのパスを書く。相対パスの起点はYAMLを置いたディレクトリである。
+Pass a mask as the `mask` argument to `evaluate_mask`, or through `--mask` for `maskrf evaluate` and `maskrf inspect`. Mask evaluation requires `geometry.kind: mask` and `solver.excitations: [1, 2]`. To specify the mask in YAML for `run`, `convergence`, or `inspect --config`, set `geometry.file` to the path of a CSV or black-and-white PNG. Relative paths resolve from the YAML file's directory.
 
-材料・形状・格子の変更には個別の精度確認が必要である。図3(a)について確認した格子差を、変更後の設定や任意マスクの誤差上限として使わない。
+Changes to material, geometry, or grid settings require their own accuracy checks. The observed grid differences for Fig. 3(a) apply to the cases tested.
 
-### 短絡と給電線の設定
+### Shorts and feed lines
 
-CSVは中央16×16の金属パターンを指定する。短絡と給電線の位置・寸法は設定YAMLで指定する。マスク中心を原点とし、右が+x、上が+yである。
+The CSV defines the central 16×16 metal pattern. The configuration YAML specifies the positions and dimensions of the shorts and feed lines. The origin is the center of the mask, with +x to the right and +y up.
 
-| 設定 | 内容 |
+| Setting | Meaning |
 |---|---|
-| `geometry.shorts[].xy_mm`、`width_mm` | 短絡ごとの中心 `[x, y]` と、基板を貫通する正方形の導体の一辺 |
-| `geometry.shorts[].pad_width_mm` | 任意。短絡と同じ中心に置く上面金属パッドの一辺。マスク外に短絡を置く場合は、パッドがマスク端の金属に接するように位置と幅を指定する |
-| `ports.y_mm`、`ports.width_mm` | 左右の給電線の中心 `[左のy, 右のy]` と、左右共通の線幅 |
-| `ports.neck.length_mm`、`width_mm` | 任意。マスクに接する側の区間の長さと幅。左右に共通で、幅は `ports.width_mm` 以下とする。区間の長さは `feed_length_mm` に含まれ、励振と測定は外側の区間に置く |
+| `geometry.shorts[].xy_mm`, `width_mm` | The center `[x, y]` of each short and the side length of its square conductor through the substrate |
+| `geometry.shorts[].pad_width_mm` | Optional side length of a top metal pad with the same center as the short. For a short outside the mask, position and size the pad so it touches the metal at the edge of the mask |
+| `ports.y_mm`, `ports.width_mm` | The centers of the feed lines `[left y, right y]` and their common width |
+| `ports.neck.length_mm`, `width_mm` | Optional length and width of the section that meets the mask. The two feeds use the same dimensions, and the neck width must be at most `ports.width_mm`. The neck is included in `feed_length_mm`. Excitation and measurement take place in the outer section |
 
-[図3(a)の外周短絡と細い給電接続の設定例](../examples/configs/paper_outer_terminals.yaml)では、2か所の外周パッドと、長さ・幅とも0.125 mmの給電先端を指定している。形状確認と解析には同じYAMLを渡す。
+The [configuration for Fig. 3(a) with outer shorts and narrow feed connections](../examples/configs/paper_outer_terminals.yaml) specifies two peripheral pads and feed connections that are each 0.125 mm long and 0.125 mm wide. Use the same YAML to inspect and simulate the model.
 
 ```bash
 uv run maskrf inspect --mask examples/data/fig3a-mask.csv --config examples/configs/paper_outer_terminals.yaml --out tmp/outer-terminals-inspect
 uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --config examples/configs/paper_outer_terminals.yaml --out tmp/outer-terminals-run
 ```
 
-給電幅を変更して給電線の縁の格子検査に失敗した場合は、`mesh.local_mm` を小さくして `inspect` で確認する。
+If a feed width change causes the grid check at the feed edges to fail, reduce `mesh.local_mm` and check the grid with `inspect`.
 
 ## 2. Python API
 
-公開APIは `evaluate_mask`、`load_response`、戻り値の `CircuitResponse`、解析失敗を表す `SimulationError` である。
+The public API includes `evaluate_mask`, `load_response`, their return type `CircuitResponse`, and `SimulationError` for failed simulations.
 
 ```python
 from maskrf import evaluate_mask
@@ -59,20 +61,20 @@ s21 = response.s[:, 1, 0]
 print(response.metrics["first_downward_3dB_GHz"])
 ```
 
-`evaluate_mask(mask, out_dir, *, config_path=None)` は同期処理である。毎回、両ポートを独立に励振して新規解析するため、openEMS・CSXCADのPythonバインディングと共有ライブラリが必要になる。未導入なら `(Y/n)` で導入を確認し、承諾後にインストールして解析を続ける。拒否または入力なしの終了では `SimulationError` となり、出力先は作成しない。標準設定の解析は数十分以上かかる。出力先は未使用のディレクトリにする。
+`evaluate_mask(mask, out_dir, *, config_path=None)` runs synchronously. Each call starts a new simulation with independent excitation at both ports and requires the openEMS and CSXCAD Python bindings and shared libraries. If they are missing, MaskRF prompts for installation with `(Y/n)`, installs them on confirmation, and continues the simulation. Declining or reaching the end of input raises `SimulationError` before the output directory is created. A default simulation takes tens of minutes or longer. Choose an unused directory for the output.
 
-| 戻り値 | 内容 |
+| Return value | Meaning |
 |---|---|
-| `frequency_Hz` | Hz単位の周波数配列。標準は10–30 GHzの401点 |
-| `s` | 複素配列 `(周波数点数, 2, 2)`。`s[:, i-1, j-1]` がSij |
-| `metrics` | S21の帯域指標、下降側−3 dB交差、相反性・電力比・受動性の指標など |
-| `settings`・`mask` | 解析・計測条件と入力マスク |
-| `run_dir` | 解析結果の所在 |
-| `to_dict()` | 実部・虚部、dB振幅、度単位の位相、指標を含むJSON化可能な辞書 |
+| `frequency_Hz` | Frequency array in Hz. The default has 401 points from 10–30 GHz |
+| `s` | Complex array of shape `(number of frequencies, 2, 2)`, with Sij at `s[:, i-1, j-1]` |
+| `metrics` | S21 band metrics, the downward −3 dB crossing, and metrics for reciprocity, power ratios, and passivity |
+| `settings`, `mask` | Simulation and measurement settings and the input mask |
+| `run_dir` | Location of the simulation results |
+| `to_dict()` | JSON-serializable dictionary with real and imaginary parts, magnitude in dB, phase in degrees, and metrics |
 
-### 保存結果の読み込み
+### Loading saved results
 
-`load_response(run_dir)` は完了済み解析または `evaluate_mask` の出力から応答を読み込む。解析や波形の再処理は行わないため、openEMS・CSXCADは不要である。
+`load_response(run_dir)` reads the response from a completed run or from the output of `evaluate_mask`. It reads the stored data directly, so it can run without openEMS and CSXCAD or waveform reprocessing.
 
 ```python
 from maskrf import load_response
@@ -81,69 +83,69 @@ saved = load_response("tmp/python-example")
 s21 = saved.s[:, 1, 0]
 ```
 
-両励振の正常終了・減衰、周波数配列、全S成分の有限値を検査する。減衰を満たさない解析は `SimulationError` として拒否する。`evaluate_mask` と `load_response` の呼び出しではメッシュ収束を調べず、厳密な受動性違反を理由とする自動排除も行わない。これらは指標と追加検証で判断する。
+Both functions check that the two excitations completed with sufficient decay, validate the frequency array, and require every S-parameter value to be finite. They reject runs that fail the decay criterion with `SimulationError`. Assess mesh convergence and strict passivity separately using the reported metrics and additional checks.
 
-## 3. CLIと保存結果
+## 3. CLI and saved results
 
 ```bash
 uv run maskrf evaluate --mask examples/data/fig3a-mask.csv --out tmp/circuit-01
 ```
 
-### evaluate のオプション
+### Evaluate options
 
-| オプション | 必須 | 意味 |
+| Option | Required | Meaning |
 |---|---|---|
-| `--mask PATH` | 必須 | 評価する16×16マスク。CSV・JSON・白黒PNGのいずれか |
-| `--out DIR` | 必須 | 入力・設定と応答を保存する未使用のディレクトリ |
-| `--config YAML` | 任意 | 解析設定。省略時は[同梱の標準設定](../src/maskrf/configs/paper_corrected.yaml)を使う |
+| `--mask PATH` | Yes | 16×16 mask to evaluate as a CSV, JSON array, or black-and-white PNG |
+| `--out DIR` | Yes | Unused directory for the input, configuration, and response |
+| `--config YAML` | No | Simulation settings. Defaults to the [bundled configuration](../src/maskrf/configs/paper_corrected.yaml) |
 
-CLIは `uv run python -m maskrf` からも呼び出せる。
+You can also invoke the CLI with `uv run python -m maskrf`.
 
-### 保存される結果
+### Output files
 
-`evaluate` は成功時に応答JSONを標準出力と `response.json` に返す。失敗時は非ゼロ終了となり、エラーJSONを標準エラーに出す。解析開始後の失敗は `error.json` にも残す。入力やソルバのログは出力先へ保存する。
+On success, `evaluate` writes the response JSON to standard output and `response.json`. On failure, it exits with a nonzero status and writes error JSON to standard error. Failures after the simulation starts also produce `error.json`. The output directory stores the input and solver logs.
 
-初回の導入確認と進捗案内は標準エラーに表示する。導入に失敗した場合はXDGの状態ディレクトリに保存したログの場所を示す。保存先と必要なツールは[README](../README.md#導入)を参照する。
+The first-run installation prompt and progress messages go to standard error. If installation fails, MaskRF displays the path to the log in the XDG state directory. See the [README](../README.md#installation) for the installation locations and required tools.
 
-| 主なファイル | 内容 |
+| Main files | Contents |
 |---|---|
-| `mask.csv`・`request.yaml`・`request.json` | 入力マスク、実際に渡した設定、入力のハッシュと形状監査 |
-| `response.json` | 完了した応答と指標、解析ディレクトリへの参照 |
-| `execution.log` | 新規解析プロセスのログ |
-| `run/effective.json`・`run/status.json` | 新規解析の実効設定と各励振の終了・減衰判定 |
-| `run/sparameters.csv`・`run/network.s2p` | 全複素SのCSVとTouchstone |
-| `run/solver-*.log`・`run/excite-*/` | 励振ごとのログと波形 |
+| `mask.csv`, `request.yaml`, `request.json` | Input mask, settings passed to the solver, input hash, and geometry audit |
+| `response.json` | Completed response, metrics, and a reference to the run directory |
+| `execution.log` | Log from the simulation process |
+| `run/effective.json`, `run/status.json` | Effective simulation settings and completion and decay status for each excitation |
+| `run/sparameters.csv`, `run/network.s2p` | Full complex S-parameters in CSV and Touchstone formats |
+| `run/solver-*.log`, `run/excite-*/` | Logs and waveforms for each excitation |
 
-### inspect で回路形状を確認する
+### Inspecting the circuit geometry
 
-`inspect` は解析モデルと計算格子を組み立て、励振を実行せずに形状図を出力する。次の例はマスクCSVと同梱の標準設定を使う。モデルの組み立てにはopenEMS・CSXCADのPythonバインディングと共有ライブラリが必要で、未導入の場合は `(Y/n)` で導入を確認する。
+`inspect` builds the model and computational grid and exports the geometry before any excitation is run. This example uses a mask CSV and the bundled configuration. Building the model requires the openEMS and CSXCAD Python bindings and shared libraries. If they are missing, MaskRF prompts for installation with `(Y/n)`.
 
 ```bash
 uv run maskrf inspect --mask examples/data/fig3a-mask.csv --out tmp/inspect-01
 ```
 
-| オプション | 必須 | 意味 |
+| Option | Required | Meaning |
 |---|---|---|
-| `--mask PATH` | `--config` 省略時に必須 | 描画する16×16マスク。CSV・JSON・白黒PNGのいずれか |
-| `--config YAML` | `--mask` 省略時に必須 | 形状と計算格子を定義する解析設定。省略時は同梱の標準設定 |
-| `--out DIR` | 任意 | 出力先。省略時は `tmp/maskrf-inspect` |
+| `--mask PATH` | If `--config` is omitted | 16×16 mask to draw as a CSV, JSON array, or black-and-white PNG |
+| `--config YAML` | If `--mask` is omitted | Settings that define the geometry and grid. Defaults to the bundled configuration |
+| `--out DIR` | No | Output directory. Defaults to `tmp/maskrf-inspect` |
 
-両方を指定すると、金属パターンは `--mask` のファイルから、基板・給電線などの条件は `--config` のYAMLから読み込む。設定YAMLにマスクのパスが含まれていれば、`inspect --config YAML` でも描画できる。
+If both options are given, MaskRF reads the metal pattern from `--mask` and the substrate, feed lines, and other settings from the `--config` YAML. If the YAML includes the mask path, `inspect --config YAML` is enough.
 
-| 出力ファイル | 内容 |
+| Output file | Contents |
 |---|---|
-| `geometry.png` | 金属パターン、給電線、測定面、短絡位置を示す平面図と、基板・GNDの概略断面図 |
-| `geometry.xml` | openEMS・CSXCADで使用する形状のXML |
-| `mesh.json` | 各軸の格子座標、セル数、給電線の縁における格子の確認結果 |
-| `geometry-audit.json` | マスクの寸法、金属セル数、接続成分数など |
+| `geometry.png` | Plan view showing the metal pattern, feeds, measurement planes, and short locations, and a schematic cross section of the substrate and ground plane |
+| `geometry.xml` | Geometry XML for openEMS and CSXCAD |
+| `mesh.json` | Grid coordinates for each axis, cell counts, and grid checks at the feed edges |
+| `geometry-audit.json` | Mask dimensions, number of metal cells, number of connected components, and other geometry details |
 
-標準出力には格子座標を除いた `mesh.json` の内容をJSONで表示する。
+Standard output contains the fields from `mesh.json` as JSON, with the grid coordinates omitted.
 
-### 解析・比較コマンド
+### Analysis and comparison commands
 
-`run` は設定YAMLを使って新規解析を実行する。`convergence` は設定の `convergence` に列挙した各格子で新規解析し、段階間の差を計算する。`compare` と `postprocess` は保存波形を再処理するため、openEMS・CSXCADのPythonバインディングと共有ライブラリも必要になる。
+`run` starts a new simulation from the configuration YAML. `convergence` runs a new simulation for each grid listed under `convergence` and computes differences between stages. `compare` and `postprocess` reprocess saved waveforms and also require the openEMS and CSXCAD Python bindings and shared libraries.
 
-`run` と `convergence` は、各励振の正常終了と減衰を確認する。終了コード0でも減衰条件未達なら状態とログを保存して非ゼロ終了し、後続の励振・格子解析と通常の後処理へは進まない。`postprocess` は設定した全励振の波形が保存されている場合に診断用の再処理として使えるが、その処理の成功は解析の正常終了・減衰を意味しない。第1励振で停止して第2励振の波形がないrunは、そのまま全Sを再処理できない。
+`run` and `convergence` check that each excitation completes successfully and meets the decay criterion. Even when the solver returns exit code 0, a run that fails the decay criterion saves its status and logs and exits with a nonzero status before further excitations, grid runs, or routine postprocessing. When waveforms for all configured excitations are available, `postprocess` can reprocess them for diagnostics. Check completion and decay separately from postprocessing. If the run stopped after the first excitation, the full S-matrix requires the missing second excitation.
 
 ```bash
 uv run maskrf run --config examples/configs/paper_corrected.yaml --out tmp/raw-run-01
@@ -152,38 +154,38 @@ uv run maskrf compare --runs tmp/raw-run-01 tmp/raw-run-02 --out tmp/comparison-
 uv run maskrf convergence --config examples/configs/paper_corrected.yaml --out tmp/convergence-01
 ```
 
-比較する解析は同じ周波数配列を必要とする。`raw-run-02` は比較対象の設定で別途実行した解析を指定する。各runに両励振の波形が保存されている場合、`compare` は未完了・未減衰の応答も診断用に比較できるが、比較処理の終了コードだけで格子検証を合格とは判断しない。
+Runs must share the same frequency array for comparison. Supply a separate run with the comparison settings as `raw-run-02`. If both excitations have saved waveforms in each run, `compare` can include incomplete or insufficiently decayed responses for diagnostics. To judge grid verification, check the comparison fields below in addition to the exit code.
 
-`comparison.json` の各行の `time_decay_confirmed` は、両励振の正常終了と減衰を確認した結果である。比較行の `both_runs_completed_and_decayed` は現在の解析と前の解析の両方を検査する。`full_s_delta_threshold_pass` は振幅・特徴周波数・全複素Sの差だけの判定、`full_s_threshold_pass` はその数値差と両解析の完了・減衰を満たす判定である。格子検証には後者を確認し、厳密な受動性や原論文との一致とは区別する。
+In each row of `comparison.json`, `time_decay_confirmed` reports whether both excitations in the run completed and met the decay criterion. In comparison rows, `both_runs_completed_and_decayed` applies the check to both the current and previous runs. `full_s_delta_threshold_pass` checks the differences in magnitude, feature frequency, and the full complex S-matrix. `full_s_threshold_pass` also requires both runs to complete with sufficient decay. Use `full_s_threshold_pass` for grid verification. Strict passivity and agreement with the source paper require separate checks.
 
-## 4. ターゲットS21のRMSE採点
+## 4. Scoring against a target S21 with RMSE
 
-[score_mask.py](../examples/score_mask.py)は公開APIを使う利用側のスクリプトである。標準では、応答の線形振幅とターゲットの差からRMSEを計算し、単一のfloatを返す。
+[score_mask.py](../examples/score_mask.py) is an example client of the public API. By default, it calculates RMSE from the difference between the response and target in linear magnitude and returns a single float.
 
 ```text
 e[k] = |S21_response(f[k])| - target_magnitude[k]
 RMSE = sqrt(sum(e[k]**2) / N)
 ```
 
-ターゲット周波数へ応答の振幅を直線補間し、N点を等重みで評価する。外挿は拒否し、位相は採点しない。値は無次元で、小さいほど近く、0なら評価点で一致する。CLI・Python関数とも、指標を省略するとRMSEになる。
+The script linearly interpolates the response magnitude to the target frequencies and weights all N points equally. Target frequencies must be within the response range, and the score uses magnitude only. The score is dimensionless. Smaller values indicate closer agreement, and zero means that the magnitudes match at every target frequency. RMSE is the default for both the CLI and the Python function.
 
 ```bash
 uv run python examples/score_mask.py --mask examples/data/fig3a-mask.csv --target examples/data/lowpass-target.csv --out tmp/score-01
 ```
 
-このコマンドは新規解析と採点を実行し、openEMS・CSXCADが未導入なら `(Y/n)` で導入を確認する。成功時の標準出力はfloatの1行だけで、応答は `response.json`、採点条件・値・比較振幅は `score.json`、入力ターゲットは `target.csv` に保存する。失敗時は標準エラーと非ゼロ終了になり、floatを返さない。
+This command runs a new simulation and scores its response. If openEMS and CSXCAD are missing, it prompts for installation with `(Y/n)`. On success, standard output is a single line containing a float. The script saves the response in `response.json`, the scoring settings, score, and compared magnitudes in `score.json`, and the input target in `target.csv`. On failure, it reports the error on standard error and exits with a nonzero status before printing a score.
 
-### 採点スクリプトのオプション
+### Scoring script options
 
-| オプション | 必須 | 意味 |
+| Option | Required | Meaning |
 |---|---|---|
-| `--mask PATH` | 必須 | 評価する16×16マスク。CSV・JSON・白黒PNGのいずれか |
-| `--target CSV` | 必須 | 比較するターゲット。列と単位は後述 |
-| `--out DIR` | 必須 | 応答と採点結果を保存する未使用のディレクトリ |
-| `--metric NAME` | 任意 | `rmse`・`mse`・`mae`・`max`。省略時は `rmse` |
-| `--config YAML` | 任意 | 解析設定。省略時は同梱の標準設定を使う |
+| `--mask PATH` | Yes | 16×16 mask to evaluate as a CSV, JSON array, or black-and-white PNG |
+| `--target CSV` | Yes | Target for comparison. The columns and units are described below |
+| `--out DIR` | Yes | Unused directory for the response and score |
+| `--metric NAME` | No | `rmse`, `mse`, `mae`, or `max`. Defaults to `rmse` |
+| `--config YAML` | No | Simulation settings. Defaults to the bundled configuration |
 
-ターゲットCSVには次のいずれかの2列を指定する。周波数は正の昇順・重複なしとし、解析範囲内に置く。振幅とdBは有限値を必要とし、線形振幅は0以上とする。
+The target CSV must use one of two column pairs. Frequencies must be positive, strictly increasing, and within the simulated range. Both magnitude formats require finite values. Linear magnitudes must be nonnegative.
 
 ```csv
 frequency_GHz,s21_magnitude
@@ -193,26 +195,26 @@ frequency_GHz,s21_magnitude
 30,0
 ```
 
-もう一つの形式は `frequency_GHz,s21_dB` で、入力を `10**(dB/20)` により線形振幅へ変換する。0透過は `s21_magnitude` の0で指定する。dB形式を入力しても採点は線形振幅で行う。
+The other format is `frequency_GHz,s21_dB`. The script converts dB to linear magnitude with `10**(dB/20)` before scoring. Specify zero transmission as 0 in `s21_magnitude`.
 
-[lowpass-target.csv](../examples/data/lowpass-target.csv)は10–30 GHzを1 GHz間隔で指定し、10–15 GHzの6点を1、16–30 GHzの15点を0とした理想ローパスの例である。原論文から取得したターゲット配列やHFSS応答ではなく、マスク回路による実現可能性も確認していない。
+[lowpass-target.csv](../examples/data/lowpass-target.csv) is an idealized low-pass example from 10–30 GHz in 1 GHz increments. It assigns a magnitude of 1 to the six points from 10–15 GHz and 0 to the 15 points from 16–30 GHz. It serves as a synthetic target. The feasibility of realizing it with a mask circuit remains untested.
 
-Pythonでは `examples.score_mask.score_mask(mask, target_path, out_dir, ...) -> float` を呼び出せる。この関数も新規解析と採点を実行する。
+In Python, call `examples.score_mask.score_mask(mask, target_path, out_dir, ...) -> float`. This function also runs a new simulation and scores its response.
 
-| `--metric`／`metric` | 計算式 | 単位 |
+| `--metric` or `metric` | Formula | Units |
 |---|---|---|
-| `rmse`（標準） | `sqrt(mean(e**2))` | 線形振幅と同じ |
-| `mse` | `mean(e**2)` | 線形振幅の二乗 |
-| `mae` | `mean(abs(e))` | 線形振幅と同じ |
-| `max` | `max(abs(e))` | 線形振幅と同じ |
+| `rmse` (default) | `sqrt(mean(e**2))` | Linear magnitude |
+| `mse` | `mean(e**2)` | Linear magnitude squared |
+| `mae` | `mean(abs(e))` | Linear magnitude |
+| `max` | `max(abs(e))` | Linear magnitude |
 
-MSEとRMSEは同じ評価点・重みなら回路の順位が同じで、MAEより大きな誤差の寄与を強める。`s21_mae(...)` はMAEを計算する。最大誤差も入力した評価点だけを調べるため、点間を含めた全帯域の最大誤差は保証しない。
+MSE and RMSE rank circuits in the same order for a given set of points and weights. They give larger errors more weight than MAE does. `s21_mae(...)` computes MAE. The maximum error covers the evaluation points only. Errors can be larger between those points.
 
-RMSEは候補比較の指標であり、帯域仕様の合否判定は実装していない。通過域と阻止域の寄与は点数によって変わり、局所的な仕様違反も平均で小さく見える場合がある。用途に応じて帯域ごとの挿入損失・阻止域減衰量を確認する。原論文との再現性評価では、画像から読んだHFSS振幅へのdB RMSEを用いるため、この採点値と直接比較しない。
+Use RMSE to rank candidates. The contributions of the passband and stopband depend on the sample counts, and an average can conceal local specification violations. Check the insertion loss and stopband attenuation for each band when assessing compliance. The paper reproduction uses dB RMSE against the digitized HFSS magnitude curve, which has a different scale from the linear-magnitude score.
 
-### 保存済み応答の採点
+### Scoring a saved response
 
-保存済み結果は `load_response()` で読み込み、`s21_error()` に渡して採点する。この処理では解析を実行せず、openEMS・CSXCADも使わない。関数に渡す周波数の単位はHzである。
+Load a saved result with `load_response()` and pass it to `s21_error()`. Scoring saved data requires neither a new simulation nor openEMS and CSXCAD. Pass the frequencies to the function in Hz.
 
 ```python
 from pathlib import Path

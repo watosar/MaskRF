@@ -1,28 +1,30 @@
-# 検証レポートの保存データ
+# Saved data for the reproduction report
 
-このディレクトリは、[検証レポート](../reproduction-report.md)の掲載数値と図を確認するためのデータを収録する。同梱の標準YAMLに対応する内側短絡・一定幅給電の9分割結果は、[完了済み応答のfixture](../../tests/fixtures/README.md)と[Touchstone](adopted-network.s2p)に保存している。
+[日本語](README.ja.md)
 
-| 対象 | 保存データ |
+This directory contains the data behind the numerical results and figures in the reproduction report. The run with internal shorts, uniform-width feeds, and nine subdivisions per mask pixel corresponds to the bundled YAML. Its results are available as a test fixture and as a Touchstone file. [Reproduction report](../reproduction-report.md) · [Completed response fixture](../../tests/fixtures/README.md) · [Touchstone file](adopted-network.s2p)
+
+| Topic | Saved data |
 |---|---|
-| 原論文の条件と画像読取 | [条件・仮定](conditions.md)、[HFSS曲線](paper-hfss.csv)、[抽出条件](paper-extraction.json)、[分割の計測値](grid-measurements.json) |
-| 外周短絡と給電接続の比較 | [6ケースの集計CSV](terminal-study-summary.csv)、[給電幅2条件のS21曲線](terminal-feed-width-s21.csv)、[外周短絡・細い給電接続の4分割Touchstone](fig3a-outer-terminals.s2p) |
-| 先行実装との照合 | [マスク・抽出式の検査](prior-art-verification.json)、[COMSOL曲線](comsol-digitized.csv)、[COMSOL読取と比較指標](comsol-metrics.json) |
-| 格子と終了状態の検査 | [格子比較](mesh-comparison.json)、[監査](convergence-audit.json) |
-| 材料の感度試験 | [実験条件](material-experiment.json)、[材料・格子の監査](material-audit.json)、[全ケース一覧](material-summary.csv)、[原論文に対する採点](material-paper-selection.json)、[細分化比較](material-refinement.json)、[再抽出の検査](material-extraction-verification.json) |
-| 掲載数値と図 | [採用モデルの比較・電力指標](report-metrics.json)、[材料4条件のS21曲線](material-s21-curves.csv) |
-| ターゲット採点 | [標準RMSEの確認結果](target-score-verification.json) |
+| Conditions and digitization of the paper | [Conditions and assumptions](conditions.md), [HFSS curve](paper-hfss.csv), [Extraction settings](paper-extraction.json), [Measured grid](grid-measurements.json) |
+| External shorts and feed transitions | [Summary of six cases](terminal-study-summary.csv), [S21 curves for two feed widths](terminal-feed-width-s21.csv), [Touchstone for external shorts and narrow feed ends, four subdivisions per pixel](fig3a-outer-terminals.s2p) |
+| Comparison with prior work | [Mask and extraction checks](prior-art-verification.json), [COMSOL curves](comsol-digitized.csv), [COMSOL digitization and comparison metrics](comsol-metrics.json) |
+| Mesh and completion checks | [Grid comparison](mesh-comparison.json), [Convergence audit](convergence-audit.json) |
+| Material sensitivity | [Experiment settings](material-experiment.json), [Material and grid audit](material-audit.json), [Summary of all cases](material-summary.csv), [Comparison with the paper](material-paper-selection.json), [Refinement comparison](material-refinement.json), [Re-extraction checks](material-extraction-verification.json) |
+| Published figures and numerical results | [Comparison and power metrics for the selected model](report-metrics.json), [S21 curves for four material cases](material-s21-curves.csv) |
+| Target scoring | [Default RMSE verification](target-score-verification.json) |
 
-原論文のHFSS曲線と先行COMSOL曲線は画像からの読取値で、ソルバの数値出力原本ではない。読取範囲と座標由来の誤差は各JSONに記載する。原論文と先行実装の出典URLはレポートの参考資料にまとめている。
+The published HFSS curve and the prior COMSOL curves were digitized from images. The corresponding JSON files record the digitization range and the uncertainty due to image coordinates. The report's references identify the original paper and prior implementations.
 
-## 給電・短絡
+## Feeds and shorts
 
-内側短絡で給電端の幅を変えた粗格子試験は、[比較指標](feed-comparison.json)、[固定条件](feed-controlled-variables.json)、[検査結果](feed-final-checks.json)を保存する。短絡除去の試験は[終了状態](no-shorts-status.json)に示すとおり減衰未達で、有効な全Sを得ていない。
+The coarse-grid study with internal shorts varied the width at the feed ends. The results include the comparison metrics, the fixed settings, and the verification checks. A separate test removed the shorts. It failed to reach the decay criterion, so it yielded no valid full S-matrix. [Comparison metrics](feed-comparison.json) · [Fixed settings](feed-controlled-variables.json) · [Verification checks](feed-final-checks.json) · [Completion status](no-shorts-status.json)
 
-## 出典と再生成
+## Provenance and figure generation
 
-[provenance.json](provenance.json)には、整理前の保存場所、保存データのSHA-256、材料曲線への変換式、採用時のコア実装のSHA-256を記録する。JSON内の `tmp/` や絶対パスは生成当時の記録であり、現在の読込先ではない。ソルバの原波形・ログ、画像原本、作業記録はこのディレクトリに含めないため、それらを使った再抽出・再読取の検査は収録データだけでは反復できない。
+The provenance file records the original locations of the data, the SHA-256 hashes of saved files, the conversion used for the material curves, and the SHA-256 of the core implementation used for the selected model. Entries under `tmp/` and absolute paths refer to the original runs. Repeating extraction from waveforms or digitization from images requires the original waveforms, logs, images, and work records. [Data provenance](provenance.json)
 
-内側短絡・一定幅給電のHFSS比較図と材料比較図は、[描画コード](../../examples/plot_report.py)で保存データから生成できる。リポジトリのルートで次を実行すると、図を指定先へ保存する。
+The plotting script generates the HFSS comparison for internal shorts with uniform-width feeds and the material comparison from the saved data. Run it from the repository root to save the figures to the specified directory. [Plotting script](../../examples/plot_report.py)
 
 ```bash
 source env.sh
